@@ -1,19 +1,15 @@
-"""
-Views para o sistema de equipamentos - VERSÃO ATUALIZADA
-Implementação do filtro Cliente ↔ Equipamentos
-"""
-
 # GSLEARNING - equipment/views.py
+# VERSÃO CORRIGIDA: Barra de progresso funcionando no client_list.html
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, DetailView, TemplateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
-from django.db.models import Q
-from django.http import Http404
+from django.db.models import Q, Count
+from django import forms
 
-from .models import EquipmentCategory, Equipment, ClientEquipment
+from .models import Equipment, EquipmentCategory, ClientEquipment
 
 
 class AdminRequiredMixin(UserPassesTestMixin):
@@ -23,23 +19,20 @@ class AdminRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and self.request.user.is_admin
 
 
-# ===== VIEWS DO CLIENTE - ATUALIZADAS COM FILTRO =====
+# ===== VIEWS DO CLIENTE =====
 
 class EquipmentListView(LoginRequiredMixin, ListView):
-    """Lista de equipamentos para o cliente - FILTRADO POR CLIENTE"""
+    """
+    Lista de equipamentos para cliente com cálculo correto de progresso
+    CORREÇÃO: Agora calcula progresso corretamente para cada equipamento
+    """
     model = Equipment
     template_name = 'equipment/client_list.html'
     context_object_name = 'equipments'
     
     def get_queryset(self):
-        """NOVA LÓGICA: Filtrar apenas equipamentos do cliente logado"""
+        """Retorna apenas equipamentos do cliente logado"""
         user = self.request.user
-        
-        # Se for admin, mostrar todos (para teste)
-        if user.is_admin:
-            return Equipment.objects.filter(is_active=True).order_by('category__order', 'order')
-        
-        # Se for cliente, filtrar apenas equipamentos associados a ele
         return Equipment.objects.filter(
             is_active=True,
             equipment_clients__client=user,
@@ -47,95 +40,47 @@ class EquipmentListView(LoginRequiredMixin, ListView):
         ).order_by('category__order', 'order')
     
     def get_context_data(self, **kwargs):
+        """
+        Contexto simples - cálculos feitos via template tags
+        """
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         
-        # Adicionar progresso para cada equipamento
-        from training.models import TrainingModule, TrainingProgress
-        equipments_with_progress = []
-        
-        for equipment in context['equipments']:
-            total_modules = TrainingModule.objects.filter(
-                equipment=equipment, 
-                is_active=True
-            ).count()
-            
-            completed_modules = TrainingProgress.objects.filter(
-                client=user,
-                module__equipment=equipment,
-                status='completed'
-            ).count()
-            
-            if total_modules > 0:
-                progress_percentage = (completed_modules / total_modules) * 100
-            else:
-                progress_percentage = 0
-            
-            equipments_with_progress.append({
-                'equipment': equipment,
-                'total_modules': total_modules,
-                'completed_modules': completed_modules,
-                'progress_percentage': progress_percentage,
-            })
-        
-        context['equipments_with_progress'] = equipments_with_progress
-        
-        # NOVO: Adicionar informações de debug
-        context['user_type'] = user.user_type
-        context['total_available_equipments'] = Equipment.objects.filter(is_active=True).count()
-        context['client_equipments_count'] = ClientEquipment.objects.filter(
-            client=user, 
-            is_active=True
-        ).count() if user.user_type == 'client' else 0
+        # Adicionar categorias para filtros
+        context['categories'] = EquipmentCategory.objects.filter(is_active=True)
         
         return context
 
 
 class EquipmentDetailView(LoginRequiredMixin, DetailView):
-    """Detalhes do equipamento para o cliente - COM VERIFICAÇÃO DE ACESSO"""
+    """Detalhes de um equipamento para o cliente"""
     model = Equipment
     template_name = 'equipment/client_detail.html'
     context_object_name = 'equipment'
     
     def get_queryset(self):
-        """NOVA LÓGICA: Verificar se cliente tem acesso ao equipamento"""
+        """Cliente só pode ver equipamentos que possui"""
         user = self.request.user
-        
-        # Se for admin, pode ver todos
-        if user.is_admin:
-            return Equipment.objects.filter(is_active=True)
-        
-        # Se for cliente, apenas equipamentos associados
         return Equipment.objects.filter(
             is_active=True,
             equipment_clients__client=user,
             equipment_clients__is_active=True
         )
     
-    def dispatch(self, request, *args, **kwargs):
-        """Verificar acesso antes de processar"""
-        try:
-            return super().dispatch(request, *args, **kwargs)
-        except Http404:
-            # Se cliente tentar acessar equipamento que não possui
-            if not request.user.is_admin:
-                messages.error(request, 'Você não tem acesso a este equipamento.')
-                return redirect('equipment:list')
-            raise
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         equipment = self.object
         user = self.request.user
         
-        # Módulos do equipamento
+        # Importar models necessários
         from training.models import TrainingModule, TrainingProgress
+        
+        # Módulos do equipamento
         modules = TrainingModule.objects.filter(
             equipment=equipment,
             is_active=True
         ).order_by('order')
         
-        # Progresso do usuário em cada módulo - LÓGICA MANTIDA
+        # Progresso do usuário em cada módulo
         modules_with_progress = []
         for module in modules:
             try:
@@ -143,22 +88,16 @@ class EquipmentDetailView(LoginRequiredMixin, DetailView):
                     client=user,
                     module=module
                 )
-            except TrainingProgress.DoesNotExist:
-                progress = None
-            
-            # Verificar completion_percentage corretamente
-            if progress:
-                is_completed = progress.status == 'completed' and progress.completion_percentage >= 95
-                completion_percentage = min(progress.completion_percentage, 100)
+                completion_percentage = progress.completion_percentage
+                is_completed = progress.status == 'completed'
                 status = progress.status
-            else:
-                is_completed = False
+            except TrainingProgress.DoesNotExist:
                 completion_percentage = 0
+                is_completed = False
                 status = 'not_started'
             
             modules_with_progress.append({
                 'module': module,
-                'progress': progress,
                 'is_completed': is_completed,
                 'completion_percentage': completion_percentage,
                 'status': status,

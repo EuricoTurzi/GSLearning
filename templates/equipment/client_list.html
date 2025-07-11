@@ -1,6 +1,8 @@
 <!-- GSLEARNING - templates/equipment/client_list.html -->
+<!-- VERSÃO CORRIGIDA: Template usando template tags para progresso -->
 {% extends 'base/base.html' %}
 {% load static %}
+{% load equipment_extras %}
 
 {% block title %}Equipamentos - GSLearning{% endblock %}
 
@@ -27,14 +29,13 @@
             <div class="hidden lg:flex items-center space-x-4">
                 <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg px-4 py-2">
                     <div class="text-blue-100 text-sm">Total disponível</div>
-                    <div class="text-white font-semibold">{{ equipments.count }} equipamento{{ equipments.count|pluralize }}</div>
+                    <div class="text-white font-semibold">{{ equipments|length }} equipamento{{ equipments|length|pluralize }}</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
 
 {% block content %}
 <div class="space-y-8">
@@ -78,7 +79,7 @@
         {% for equipment in equipments %}
         <div class="equipment-card" 
              data-category="{{ equipment.category.slug }}" 
-             data-status="{{ equipment.status|default:'not_started' }}"
+             data-status="{{ equipment|equipment_status:user }}"
              data-name="{{ equipment.name|lower }}">
             
             <!-- Imagem do Equipamento -->
@@ -92,11 +93,11 @@
                 {% endif %}
                 
                 <!-- Badge de Status -->
-                <div class="status-badge {{ equipment.status|default:'not_started' }}">
-                    {% if equipment.progress_percentage == 100 %}
+                <div class="status-badge {{ equipment|equipment_status:user }}">
+                    {% if equipment|equipment_progress:user == 100 %}
                         <i class="fas fa-check"></i> Concluído
-                    {% elif equipment.progress_percentage > 0 %}
-                        <i class="fas fa-play"></i> {{ equipment.progress_percentage }}%
+                    {% elif equipment|equipment_progress:user > 0 %}
+                        <i class="fas fa-play"></i> {{ equipment|equipment_progress:user }}%
                     {% else %}
                         <i class="fas fa-clock"></i> Não iniciado
                     {% endif %}
@@ -129,7 +130,7 @@
                     
                     <div class="info-item">
                         <span class="info-label">Módulos:</span>
-                        <span class="info-value">{{ equipment.total_modules|default:0 }} módulo{{ equipment.total_modules|pluralize }}</span>
+                        <span class="info-value">{{ equipment|equipment_total_modules }} módulo{{ equipment|equipment_total_modules|pluralize }}</span>
                     </div>
                 </div>
                 
@@ -137,14 +138,14 @@
                 <div class="equipment-progress">
                     <div class="progress-header">
                         <span class="progress-label">Progresso do Treinamento</span>
-                        <span class="progress-percentage">{{ equipment.progress_percentage|default:0 }}%</span>
+                        <span class="progress-percentage">{{ equipment|equipment_progress:user }}%</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ equipment.progress_percentage|default:0 }}%"></div>
+                        <div class="progress-fill" style="width: {{ equipment|equipment_progress:user }}%"></div>
                     </div>
                     <div class="progress-details">
                         <span class="text-xs text-gray-500">
-                            {{ equipment.completed_modules|default:0 }} de {{ equipment.total_modules|default:0 }} módulos concluídos
+                            {{ equipment|equipment_completed_modules:user }} de {{ equipment|equipment_total_modules }} módulos concluídos
                         </span>
                     </div>
                 </div>
@@ -152,10 +153,10 @@
                 <!-- Ações -->
                 <div class="equipment-actions">
                     <a href="{% url 'equipment:detail' equipment.pk %}" class="equipment-action primary">
-                        {% if equipment.progress_percentage == 100 %}
+                        {% if equipment|equipment_progress:user == 100 %}
                             <i class="fas fa-redo"></i>
                             Revisar Conteúdo
-                        {% elif equipment.progress_percentage > 0 %}
+                        {% elif equipment|equipment_progress:user > 0 %}
                             <i class="fas fa-play"></i>
                             Continuar Treinamento
                         {% else %}
@@ -164,7 +165,7 @@
                         {% endif %}
                     </a>
                     
-                    {% if equipment.progress_percentage == 100 %}
+                    {% if equipment|equipment_progress:user == 100 %}
                     <a href="#" class="equipment-action secondary">
                         <i class="fas fa-certificate"></i>
                         Ver Certificado
@@ -187,50 +188,72 @@
     
     {% else %}
     <!-- Estado Vazio -->
-    <div class="text-center py-16">
-        <div class="text-gray-400 mb-6">
-            <i class="fas fa-inbox text-6xl"></i>
+    <div class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <i class="fas fa-laptop text-6xl"></i>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-4">Nenhum equipamento disponível</h3>
-        <p class="text-gray-500 mb-6">Você ainda não possui equipamentos associados para treinamento.</p>
-        <div class="space-y-2 text-sm text-gray-400">
-            <p>• Entre em contato com o administrador para liberar seus equipamentos</p>
-            <p>• Verifique se sua conta está ativa e configurada corretamente</p>
-        </div>
-        <div class="mt-8">
-            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Voltar ao Dashboard
-            </a>
-        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum equipamento disponível</h3>
+        <p class="text-gray-500">Entre em contato com o administrador para liberar equipamentos.</p>
     </div>
     {% endif %}
     
-    <!-- Dicas de Navegação -->
-    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
-        <h3 class="text-lg font-semibold text-indigo-900 mb-4">💡 Dicas de Navegação</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-indigo-800">
-            <div class="flex items-start space-x-2">
-                <span class="text-indigo-600">•</span>
-                <span>Clique em "Iniciar Treinamento" para começar os módulos do equipamento</span>
-            </div>
-            <div class="flex items-start space-x-2">
-                <span class="text-indigo-600">•</span>
-                <span>Use os filtros para encontrar equipamentos específicos rapidamente</span>
-            </div>
-            <div class="flex items-start space-x-2">
-                <span class="text-indigo-600">•</span>
-                <span>Seu progresso é salvo automaticamente em cada módulo</span>
-            </div>
-            <div class="flex items-start space-x-2">
-                <span class="text-indigo-600">•</span>
-                <span>Complete todos os módulos para receber seu certificado</span>
-            </div>
-        </div>
+    <!-- Debug Info -->
+    {% if debug_info %}
+    <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
+        <h4 class="text-sm font-medium text-blue-800 mb-2">🔧 Debug Info</h4>
+        <ul class="text-sm text-blue-700 space-y-1">
+            <li>• Usuário: {{ debug_info.user }} ({{ debug_info.user_type }})</li>
+            <li>• Equipamentos: {{ debug_info.equipments_count }}</li>
+            <li>• Template: {{ debug_info.template }}</li>
+        </ul>
     </div>
+    {% endif %}
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/equipment.js' %}"></script>
+<!-- JavaScript para filtros -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filters = document.querySelectorAll('.equipment-filter');
+    const search = document.getElementById('equipmentSearch');
+    const cards = document.querySelectorAll('.equipment-card');
+    const noResults = document.getElementById('noResults');
+    
+    function filterEquipments() {
+        const categoryFilter = document.querySelector('[data-filter="category"]').value;
+        const statusFilter = document.querySelector('[data-filter="status"]').value;
+        const searchTerm = search.value.toLowerCase();
+        
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+            const category = card.dataset.category;
+            const status = card.dataset.status;
+            const name = card.dataset.name;
+            
+            const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
+            const statusMatch = statusFilter === 'all' || status === statusFilter;
+            const searchMatch = searchTerm === '' || name.includes(searchTerm);
+            
+            if (categoryMatch && statusMatch && searchMatch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+        } else {
+            noResults.classList.add('hidden');
+        }
+    }
+    
+    filters.forEach(filter => {
+        filter.addEventListener('change', filterEquipments);
+    });
+    
+    search.addEventListener('input', filterEquipments);
+});
+</script>
 {% endblock %}
