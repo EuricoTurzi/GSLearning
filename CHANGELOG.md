@@ -69,3 +69,9 @@
 - Fix: Ajustado CSS verify.css para proporções mais naturais
 - Update: Padding menor, hover mais sutil, ícones mais equilibrados
 - Status: Layout mais harmonioso e menos "estranho"
+
+## 2025-07-11 16:34
+- HTML: Layout mais limpo e natural
+- Fix: Removido fundo escuro → branco, cards mais simples
+- Update: Só 1 card verde (sem animações problemáticas), layout em grid
+- Status: HTML mais equilibrado - agora vou arrumar o CSS

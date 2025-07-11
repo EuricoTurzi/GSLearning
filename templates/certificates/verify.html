@@ -1,5 +1,5 @@
 <!-- GSLEARNING - templates/certificates/verify.html -->
-<!-- VERSÃO NOVA: Seguindo padrão visual trabalhado -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,12 +8,12 @@
     <title>{% if valid %}Certificado Válido{% else %}Verificação Falhou{% endif %} - GSLearning</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% load static %}{% static 'css/verify.css' %}">
+    <link rel="stylesheet" href="{% static 'css/verify.css' %}">
 </head>
 <body class="bg-gray-50 min-h-screen">
     
     <!-- Header Público -->
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
+    <div class="verify-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="verify-container max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         
         {% if valid %}
         <!-- CERTIFICADO VÁLIDO -->
@@ -44,14 +44,14 @@
             
             <!-- Header de Sucesso -->
             <div class="text-center">
-                <div class="dashboard-client-card success verify-card">
+                <div class="dashboard-client-card success verify-card success-pulse">
                     <div class="text-center">
                         <div class="card-icon mx-auto mb-4">
                             <i class="fas fa-check-circle text-6xl"></i>
                         </div>
                         <h2 class="text-3xl font-bold text-white mb-2">Certificado Válido!</h2>
                         <p class="text-green-100 text-lg">Este certificado é autêntico e foi emitido pelo GSLearning</p>
-                        <div class="mt-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+                        <div class="mt-4 content-area inline-block">
                             <p class="text-white text-sm">Verificado em {{ "now"|date:"d/m/Y às H:i" }}</p>
                         </div>
                     </div>
@@ -64,24 +64,26 @@
                 <!-- Informações do Cliente -->
                 <div class="dashboard-client-card primary">
                     <div class="card-icon mb-4">
-                        <i class="fas fa-user text-4xl"></i>
+                        <i class="fas fa-user-graduate text-4xl"></i>
                     </div>
                     <div class="text-center">
-                        <h3 class="text-xl font-bold text-white mb-4">Dados do Cliente</h3>
-                        <div class="space-y-3 text-left bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
-                            <div class="flex justify-between">
-                                <span class="text-blue-100">Nome:</span>
-                                <span class="text-white font-semibold">{{ certificate.client.get_full_name|default:certificate.client.username }}</span>
-                            </div>
-                            {% if certificate.client.company %}
-                            <div class="flex justify-between">
-                                <span class="text-blue-100">Empresa:</span>
-                                <span class="text-white font-semibold">{{ certificate.client.company }}</span>
-                            </div>
-                            {% endif %}
-                            <div class="flex justify-between">
-                                <span class="text-blue-100">Email:</span>
-                                <span class="text-white font-semibold">{{ certificate.client.email|truncatechars:25 }}</span>
+                        <h3 class="text-xl font-bold text-white mb-4">Dados do Participante</h3>
+                        <div class="content-area text-left">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-blue-100 text-sm">Nome:</span>
+                                    <span class="text-white font-semibold">{{ certificate.client.get_full_name|default:certificate.client.username }}</span>
+                                </div>
+                                {% if certificate.client.company %}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-blue-100 text-sm">Empresa:</span>
+                                    <span class="text-white font-semibold">{{ certificate.client.company }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-blue-100 text-sm">Email:</span>
+                                    <span class="text-white font-semibold text-xs">{{ certificate.client.email|truncatechars:30 }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -94,21 +96,23 @@
                     </div>
                     <div class="text-center">
                         <h3 class="text-xl font-bold text-white mb-4">Equipamento Certificado</h3>
-                        <div class="space-y-3 text-left bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
-                            <div class="flex justify-between">
-                                <span class="text-yellow-100">Nome:</span>
-                                <span class="text-white font-semibold">{{ certificate.equipment.name }}</span>
+                        <div class="content-area text-left">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-yellow-100 text-sm">Nome:</span>
+                                    <span class="text-white font-semibold">{{ certificate.equipment.name }}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-yellow-100 text-sm">Categoria:</span>
+                                    <span class="text-white font-semibold">{{ certificate.equipment.category.name }}</span>
+                                </div>
+                                {% if certificate.equipment.model %}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-yellow-100 text-sm">Modelo:</span>
+                                    <span class="text-white font-semibold">{{ certificate.equipment.model }}</span>
+                                </div>
+                                {% endif %}
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-yellow-100">Categoria:</span>
-                                <span class="text-white font-semibold">{{ certificate.equipment.category.name }}</span>
-                            </div>
-                            {% if certificate.equipment.model %}
-                            <div class="flex justify-between">
-                                <span class="text-yellow-100">Modelo:</span>
-                                <span class="text-white font-semibold">{{ certificate.equipment.model }}</span>
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -116,33 +120,33 @@
 
             <!-- Detalhes Técnicos -->
             <div class="dashboard-client-card primary">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-6">
                         <div class="card-icon">
                             <i class="fas fa-certificate text-4xl"></i>
                         </div>
                         <div>
                             <h3 class="text-2xl font-bold text-white mb-1">Detalhes da Certificação</h3>
-                            <p class="text-blue-100">Informações técnicas do certificado</p>
+                            <p class="text-blue-100">Informações técnicas e dados de emissão</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 text-center">
-                        <div class="text-blue-100 text-sm">Data de Emissão</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="content-area text-center">
+                        <div class="text-blue-100 text-sm mb-1">Data de Emissão</div>
                         <div class="text-white font-bold text-lg">{{ certificate.issued_at|date:"d/m/Y" }}</div>
                         <div class="text-blue-200 text-xs">{{ certificate.issued_at|date:"H:i" }}</div>
                     </div>
                     
-                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 text-center">
-                        <div class="text-blue-100 text-sm">Código do Certificado</div>
-                        <div class="text-white font-mono text-sm">{{ certificate.certificate_code|slice:":8" }}...</div>
-                        <div class="text-blue-200 text-xs">Identificação única</div>
+                    <div class="content-area text-center">
+                        <div class="text-blue-100 text-sm mb-1">Código Único</div>
+                        <div class="text-white font-mono text-sm">{{ certificate.certificate_code|slice:":12" }}...</div>
+                        <div class="text-blue-200 text-xs">Identificação segura</div>
                     </div>
                     
-                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 text-center">
-                        <div class="text-blue-100 text-sm">Downloads</div>
+                    <div class="content-area text-center">
+                        <div class="text-blue-100 text-sm mb-1">Downloads</div>
                         <div class="text-white font-bold text-lg">{{ certificate.download_count }}</div>
                         <div class="text-blue-200 text-xs">Vezes baixado</div>
                     </div>
@@ -156,14 +160,14 @@
             
             <!-- Header de Erro -->
             <div class="text-center">
-                <div class="dashboard-client-card" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <div class="dashboard-client-card danger verify-card error-shake">
                     <div class="text-center">
                         <div class="card-icon mx-auto mb-4">
                             <i class="fas fa-times-circle text-6xl"></i>
                         </div>
                         <h2 class="text-3xl font-bold text-white mb-2">Certificado Inválido</h2>
                         <p class="text-red-100 text-lg">{{ error|default:"Este certificado não foi encontrado ou é inválido." }}</p>
-                        <div class="mt-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+                        <div class="mt-4 content-area inline-block">
                             <p class="text-white text-sm">Verificação em {{ "now"|date:"d/m/Y às H:i" }}</p>
                         </div>
                     </div>
@@ -172,16 +176,42 @@
 
             <!-- Orientações -->
             <div class="dashboard-client-card warning">
-                <div class="flex items-center space-x-6">
+                <div class="flex items-start space-x-6">
                     <div class="card-icon">
                         <i class="fas fa-lightbulb text-4xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-bold text-white mb-2">O que fazer?</h3>
-                        <div class="text-yellow-100 space-y-2">
-                            <p>• Verifique se o link está correto e completo</p>
-                            <p>• Confirme com quem lhe forneceu o certificado</p>
-                            <p>• Entre em contato com o GSLearning se necessário</p>
+                        <h3 class="text-2xl font-bold text-white mb-3">O que fazer?</h3>
+                        <div class="content-area">
+                            <div class="text-yellow-100 space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-yellow-200 mt-1 text-sm"></i>
+                                    <span>Verifique se o link está correto e completo</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-yellow-200 mt-1 text-sm"></i>
+                                    <span>Confirme com quem lhe forneceu o certificado</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-yellow-200 mt-1 text-sm"></i>
+                                    <span>Entre em contato com o GSLearning se necessário</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Contato -->
+            <div class="dashboard-client-card primary">
+                <div class="flex items-center space-x-6">
+                    <div class="card-icon">
+                        <i class="fas fa-headset text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Precisa de Suporte?</h3>
+                        <div class="content-area">
+                            <p class="text-blue-100">Nossa equipe está pronta para ajudar você a verificar a autenticidade do seu certificado.</p>
                         </div>
                     </div>
                 </div>
@@ -191,7 +221,7 @@
 
         <!-- Rodapé -->
         <div class="mt-12 text-center">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="footer-card">
                 <div class="flex items-center justify-center space-x-2 mb-2">
                     <i class="fas fa-shield-alt text-blue-600"></i>
                     <span class="text-gray-900 font-semibold">Sistema de Verificação GSLearning</span>
@@ -207,6 +237,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="{% load static %}{% static 'js/verify.js' %}"></script>
+    <script src="{% static 'js/verify.js' %}"></script>
 </body>
 </html>
