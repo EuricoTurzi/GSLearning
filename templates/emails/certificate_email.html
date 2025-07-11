@@ -1,0 +1,80 @@
+<!-- GSLEARNING - templates/emails/certificate_email.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado Disponível - GSLearning</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .certificate-info { background: #ecfdf5; border: 1px solid #10b981; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .button { background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+        .equipment { background: #e5e7eb; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎓 Parabéns! Certificado Disponível</h1>
+            <p>Seu treinamento foi concluído com sucesso</p>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div class="content">
+            <h2>Olá, {{ client.get_full_name|default:client.username }}!</h2>
+            
+            <p>🎉 <strong>Excelente notícia!</strong> Você completou com sucesso o treinamento e seu certificado já está disponível para download.</p>
+            
+            <!-- Informações do certificado -->
+            <div class="certificate-info">
+                <h3>📜 Detalhes do Certificado</h3>
+                <p><strong>Equipamento:</strong> {{ equipment.name }}</p>
+                <p><strong>Categoria:</strong> {{ equipment.category.name }}</p>
+                <p><strong>Modelo:</strong> {{ equipment.model }}</p>
+                <p><strong>Data de emissão:</strong> {{ certificate.issued_at|date:"d/m/Y H:i" }}</p>
+                <p><strong>Código:</strong> {{ certificate.certificate_code|slice:":8" }}...</p>
+            </div>
+            
+            <!-- Botão de download -->
+            <p style="text-align: center;">
+                <a href="{{ download_url }}" class="button">📥 Baixar Certificado PDF</a>
+            </p>
+            
+            <hr style="margin: 30px 0; border: 1px solid #e5e7eb;">
+            
+            <h3>✅ Próximos passos:</h3>
+            <ul>
+                <li>Faça o download do seu certificado em PDF</li>
+                <li>O arquivo está em alta qualidade para impressão</li>
+                <li>Você pode baixar quantas vezes precisar</li>
+                <li>Use o código de verificação para comprovar autenticidade</li>
+            </ul>
+            
+            <div class="equipment">
+                <h4>🔧 Sobre o equipamento certificado:</h4>
+                <p><strong>{{ equipment.name }}</strong> - {{ equipment.model }}</p>
+                <p>Duração do treinamento: {{ equipment.estimated_duration }} minutos</p>
+                {% if equipment.description %}
+                <p>{{ equipment.description|truncatechars:150 }}</p>
+                {% endif %}
+            </div>
+            
+            <p>Parabéns pelo seu empenho e dedicação no treinamento!</p>
+            
+            <p>Atenciosamente,<br>
+            <strong>Equipe GSLearning</strong></p>
+        </div>
+        
+        <!-- Rodapé -->
+        <div class="footer">
+            <p>GSLearning - Certificação Profissional<br>
+            Este email foi enviado automaticamente, não responda.</p>
+        </div>
+    </div>
+</body>
+</html>

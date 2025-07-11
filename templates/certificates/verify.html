@@ -1,0 +1,226 @@
+<!-- GSLEARNING - templates/certificates/verify.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Certificado - GSLearning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header simples (público) -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GS</span>
+                    </div>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">Learning</span>
+                    <span class="ml-4 text-sm text-gray-500">Verificação Pública</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">Portal de Verificação</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto py-12 sm:px-6 lg:px-8">
+        <!-- Header da página -->
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900">Verificação de Certificado</h1>
+            <p class="text-gray-600 mt-2">Portal público para validação de autenticidade</p>
+        </div>
+
+        <!-- Resultado da verificação -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            {% if valid %}
+            <!-- CERTIFICADO VÁLIDO -->
+            <div class="bg-green-50 border-l-4 border-green-400 p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-green-800">✅ Certificado Válido</h2>
+                        <p class="text-green-700">Este certificado é autêntico e foi emitido pelo GSLearning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-6">Detalhes do Certificado</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Informações do Cliente -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">👤 Dados do Cliente</h4>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <span class="text-gray-500">Nome:</span>
+                                <span class="font-medium ml-2">{{ certificate.client.get_full_name|default:certificate.client.username }}</span>
+                            </div>
+                            {% if certificate.client.company %}
+                            <div>
+                                <span class="text-gray-500">Empresa:</span>
+                                <span class="font-medium ml-2">{{ certificate.client.company }}</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <span class="text-gray-500">Email:</span>
+                                <span class="font-medium ml-2">{{ certificate.client.email|truncatechars:20 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Equipamento -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">🔧 Equipamento Certificado</h4>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <span class="text-gray-500">Nome:</span>
+                                <span class="font-medium ml-2">{{ certificate.equipment.name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Categoria:</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 ml-2">
+                                    {{ certificate.equipment.category.name }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Modelo:</span>
+                                <span class="font-medium ml-2">{{ certificate.equipment.model }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Certificado -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">📜 Dados do Certificado</h4>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <span class="text-gray-500">Código:</span>
+                                <span class="font-mono text-xs bg-white px-2 py-1 rounded ml-2">{{ certificate.certificate_code }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Emitido em:</span>
+                                <span class="font-medium ml-2">{{ certificate.issued_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Status:</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 ml-2">
+                                    Válido
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estatísticas -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">📊 Informações Adicionais</h4>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <span class="text-gray-500">Downloads:</span>
+                                <span class="font-medium ml-2">{{ certificate.download_count }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Duração do Treinamento:</span>
+                                <span class="font-medium ml-2">{{ certificate.equipment.estimated_duration }} minutos</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Hash de Verificação:</span>
+                                <span class="font-mono text-xs bg-white px-2 py-1 rounded ml-2">{{ certificate.verification_hash|slice:":16" }}...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aviso de autenticidade -->
+                <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h5 class="font-medium text-blue-900">Certificado Autêntico</h5>
+                            <p class="text-sm text-blue-700 mt-1">
+                                Este certificado foi emitido automaticamente pelo sistema GSLearning após a conclusão 
+                                completa do treinamento. Todos os dados foram verificados e validados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- CERTIFICADO INVÁLIDO -->
+            <div class="bg-red-50 border-l-4 border-red-400 p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-red-800">❌ Certificado Inválido</h2>
+                        <p class="text-red-700">{{ error|default:"O código de verificação não foi encontrado em nossa base de dados." }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Possíveis motivos:</h3>
+                <ul class="text-sm text-gray-600 space-y-2">
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        Código de verificação digitado incorretamente
+                    </li>
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        Certificado pode ter sido revogado ou cancelado
+                    </li>
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        Documento pode não ser original do GSLearning
+                    </li>
+                </ul>
+
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <h5 class="font-medium text-yellow-900">Dúvidas sobre a verificação?</h5>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                Entre em contato conosco para esclarecer qualquer questão sobre a autenticidade deste documento.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Rodapé -->
+        <div class="text-center mt-8">
+            <p class="text-sm text-gray-500">
+                Sistema de verificação do GSLearning • 
+                <span class="font-medium">Portal público de autenticação</span>
+            </p>
+            <p class="text-xs text-gray-400 mt-1">
+                Verificação realizada em {{ "now"|date:"d/m/Y H:i" }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

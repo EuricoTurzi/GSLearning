@@ -1,0 +1,300 @@
+<!-- GSLEARNING - templates/training/client_module.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ module.title }} - GSLearning{% endblock %}
+
+{% block meta_description %}Treinamento do módulo {{ module.title }} - {{ equipment.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/training-player.css' %}">
+{% endblock %}
+
+{% block page_header %}
+<div class="bg-gradient-to-r from-purple-600 to-indigo-700 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                    <i class="fas fa-play text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">{{ module.title }}</h1>
+                    <p class="text-purple-100">{{ equipment.name }} • Módulo {{ module.order }}</p>
+                </div>
+            </div>
+            
+            <div class="hidden lg:flex items-center space-x-4">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                    <div class="text-purple-100 text-sm">Duração</div>
+                    <div class="text-white font-semibold">{{ module.duration|default:"--" }} min</div>
+                </div>
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                    <div class="text-purple-100 text-sm">Progresso</div>
+                    <div class="text-white font-semibold">{{ progress.completion_percentage|default:0 }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Navegação -->
+    <div class="flex items-center justify-between">
+        <a href="{% url 'equipment:detail' equipment.pk %}" class="inline-flex items-center text-gray-500 hover:text-gray-700 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Voltar ao Equipamento
+        </a>
+        
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <span>Módulo {{ module.order }} de {{ total_modules }}</span>
+        </div>
+    </div>
+
+    {% if is_locked and module.order > 1 %}
+    <!-- MÓDULO BLOQUEADO (apenas se não for o primeiro) -->
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 text-center">
+        <div class="max-w-md mx-auto">
+            <div class="w-20 h-20 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-lock text-red-400 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-4">Módulo Bloqueado</h3>
+            <p class="text-gray-300 mb-6">{{ access_message|default:"Complete o módulo anterior para desbloquear este conteúdo." }}</p>
+            {% if prev_module %}
+            <a href="{% url 'training:module' prev_module.id %}" 
+               class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar ao Módulo Anterior
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% elif module.video_file %}
+    <!-- PLAYER PRINCIPAL -->
+    <div class="bg-black rounded-xl overflow-hidden shadow-2xl">
+        <div class="relative">
+            <!-- Container do Vídeo -->
+            <div class="video-container" id="videoContainer">
+                <video 
+                    id="trainingVideo"
+                    class="w-full h-full"
+                    controls
+                    controlsList="nodownload nofullscreen"
+                    disablePictureInPicture
+                    oncontextmenu="return false;"
+                    preload="metadata"
+                    data-module-id="{{ module.id }}"
+                    data-duration="{{ module.duration_seconds|default:0 }}"
+                >
+                    <source src="{{ module.video_file.url }}" type="video/mp4">
+                    Seu navegador não suporta a reprodução de vídeo.
+                </video>
+                
+                <!-- Overlay de Status -->
+                <div id="statusOverlay" class="status-overlay">
+                    <div class="status-content">
+                        <div id="statusIcon" class="status-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div id="statusText" class="status-text">Pressione play para iniciar</div>
+                        <div id="statusSubtext" class="status-subtext">O progresso será salvo automaticamente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Painel de Progresso -->
+            <div class="bg-gray-900 p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-4">
+                        <div id="watchTime" class="text-white font-mono text-sm">
+                            <span id="currentTime">00:00</span> / <span id="totalTime">00:00</span>
+                        </div>
+                        <div id="statusIndicator" class="status-indicator ready">
+                            <span class="status-dot"></span>
+                            <span id="statusLabel">Pronto para iniciar</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-white font-semibold" id="completionPercentage">{{ progress.completion_percentage|default:0 }}%</div>
+                        <div class="text-gray-400 text-sm">Concluído</div>
+                    </div>
+                </div>
+                
+                <!-- Barra de Progresso -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill" style="width: {{ progress.completion_percentage|default:0 }}%"></div>
+                        <div class="progress-minimum" style="width: 95%"></div>
+                    </div>
+                    <div class="progress-label">95% necessário para conclusão</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controles Anti-Burla -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+            <i class="fas fa-shield-alt text-amber-600 mr-2"></i>
+            Sistema de Monitoramento Ativo
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="space-y-2">
+                <div class="flex items-center">
+                    <div id="tabStatus" class="status-dot-mini active"></div>
+                    <span class="ml-2">Aba ativa: <span id="tabStatusText" class="font-medium">Monitorando</span></span>
+                </div>
+                <div class="flex items-center">
+                    <div id="videoStatus" class="status-dot-mini ready"></div>
+                    <span class="ml-2">Vídeo: <span id="videoStatusText" class="font-medium">Pausado</span></span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center">
+                    <div id="timeStatus" class="status-dot-mini ready"></div>
+                    <span class="ml-2">Tempo válido: <span id="timeStatusText" class="font-medium">00:00</span></span>
+                </div>
+                <div class="flex items-center">
+                    <div id="progressStatus" class="status-dot-mini ready"></div>
+                    <span class="ml-2">Meta: <span id="progressStatusText" class="font-medium">95% para aprovação</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- SEM VÍDEO -->
+    <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-video-slash text-gray-400 text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Vídeo não disponível</h3>
+        <p class="text-gray-500">Este módulo ainda não possui conteúdo de vídeo.</p>
+    </div>
+    {% endif %}
+
+    <!-- Informações do Módulo -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Sobre este módulo</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Descrição -->
+            <div class="lg:col-span-2">
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Descrição</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    {{ module.description|default:"Este módulo faz parte do treinamento completo do equipamento. Assista ao vídeo e acompanhe as instruções para dominar o uso correto." }}
+                </p>
+                
+                {% if module.learning_objectives %}
+                <h4 class="text-md font-medium text-gray-900 mt-4 mb-2">Objetivos de Aprendizagem</h4>
+                <ul class="text-gray-600 space-y-1">
+                    {% for objective in module.learning_objectives %}
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                        {{ objective }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Informações Técnicas -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Informações</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Ordem:</span>
+                        <span class="font-medium">Módulo {{ module.order }}</span>
+                    </div>
+                    {% if module.duration %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Duração:</span>
+                        <span class="font-medium">{{ module.duration }} min</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Equipamento:</span>
+                        <span class="font-medium">{{ equipment.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Categoria:</span>
+                        <span class="font-medium">{{ equipment.category.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegação entre Módulos -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <!-- Módulo Anterior -->
+            <div class="flex-1">
+                {% if prev_module %}
+                <a href="{% url 'training:module' prev_module.id %}" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors group">
+                    <div class="bg-gray-100 group-hover:bg-gray-200 p-2 rounded-lg mr-3 transition-colors">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500">Anterior</div>
+                        <div class="font-medium">{{ prev_module.title|truncatechars:30 }}</div>
+                    </div>
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Status Central -->
+            <div class="flex-1 text-center">
+                <div class="inline-flex items-center space-x-2 bg-gray-50 rounded-full px-4 py-2">
+                    <span class="text-sm font-medium text-gray-600">{{ module.order }} de {{ total_modules }}</span>
+                </div>
+            </div>
+
+            <!-- Próximo Módulo -->
+            <div class="flex-1 text-right">
+                {% if next_module %}
+                    {% if next_module_available %}
+                    <a href="{% url 'training:module' next_module.id %}" class="inline-flex items-center text-purple-600 hover:text-purple-700 transition-colors group">
+                        <div>
+                            <div class="text-sm text-purple-500">Próximo</div>
+                            <div class="font-medium">{{ next_module.title|truncatechars:30 }}</div>
+                        </div>
+                        <div class="bg-purple-100 group-hover:bg-purple-200 p-2 rounded-lg ml-3 transition-colors">
+                            <i class="fas fa-arrow-right text-purple-600"></i>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="inline-flex items-center text-gray-400 cursor-not-allowed">
+                        <div>
+                            <div class="text-sm">Próximo</div>
+                            <div class="font-medium">{{ next_module.title|truncatechars:30 }}</div>
+                        </div>
+                        <div class="bg-gray-100 p-2 rounded-lg ml-3">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="inline-flex items-center text-green-600">
+                    <div>
+                        <div class="text-sm text-green-500">Parabéns!</div>
+                        <div class="font-medium">Último módulo</div>
+                    </div>
+                    <div class="bg-green-100 p-2 rounded-lg ml-3">
+                        <i class="fas fa-flag-checkered text-green-600"></i>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/training-player.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,280 @@
+<!-- GSLEARNING - templates/admin/reports/equipment_analytics.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics de Equipamentos - GSLearning Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GS</span>
+                    </div>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">Learning</span>
+                    <span class="ml-4 text-sm text-gray-500">Admin - Analytics</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'accounts:admin_dashboard' %}" class="text-gray-600 hover:text-gray-900 text-sm">← Dashboard</a>
+                    <a href="{% url 'accounts:client_progress_report' %}" class="text-gray-600 hover:text-gray-900 text-sm">Progresso Clientes</a>
+                    <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
+                    <a href="{% url 'accounts:logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header da página -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">📊 Analytics de Equipamentos</h1>
+            <p class="text-gray-600">Análise detalhada de uso e performance dos equipamentos</p>
+        </div>
+
+        <!-- Estatísticas resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-4h-2M4 9h2"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total de Equipamentos</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_equipments }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total de Usos</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_usage }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Conclusões</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_completions }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Taxa Média Conclusão</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ avg_completion_rate|floatformat:0 }}%</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros e ordenação -->
+        <div class="bg-white rounded-lg shadow mb-6">
+            <div class="p-4">
+                <form method="get" class="flex flex-wrap gap-4 items-end">
+                    <div class="min-w-48">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                        <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if category_filter == 'all' %}selected{% endif %}>Todas as Categorias</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category_filter|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="min-w-48">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Período</label>
+                        <select name="period" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if period_filter == 'all' %}selected{% endif %}>Todo o Período</option>
+                            <option value="week" {% if period_filter == 'week' %}selected{% endif %}>Última Semana</option>
+                            <option value="month" {% if period_filter == 'month' %}selected{% endif %}>Último Mês</option>
+                        </select>
+                    </div>
+                    
+                    <div class="min-w-48">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ordenar por</label>
+                        <select name="sort" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="usage" {% if sort_by == 'usage' %}selected{% endif %}>Mais Utilizados</option>
+                            <option value="completion" {% if sort_by == 'completion' %}selected{% endif %}>Maior Taxa de Conclusão</option>
+                            <option value="difficulty" {% if sort_by == 'difficulty' %}selected{% endif %}>Maior Dificuldade</option>
+                            <option value="activity" {% if sort_by == 'activity' %}selected{% endif %}>Atividade Recente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            Aplicar Filtros
+                        </button>
+                        <a href="{% url 'accounts:equipment_analytics' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">
+                            Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de equipamentos -->
+        <div class="bg-white shadow rounded-lg">
+            {% if equipment_data %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipamento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uso</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taxa Conclusão</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tempo Médio</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dificuldade</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atividade</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for eq_data in equipment_data %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    {% if eq_data.equipment.image %}
+                                    <img src="{{ eq_data.equipment.image.url }}" alt="{{ eq_data.equipment.name }}" class="h-10 w-10 rounded-lg object-cover mr-3">
+                                    {% else %}
+                                    <div class="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
+                                        <span class="text-gray-500 text-xs">📦</span>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ eq_data.equipment.name }}</div>
+                                        <div class="text-sm text-gray-500">{{ eq_data.equipment.category.name }} - {{ eq_data.equipment.model }}</div>
+                                        <div class="text-xs text-gray-400">{{ eq_data.total_modules }} módulo{{ eq_data.total_modules|pluralize }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <div class="font-medium">{{ eq_data.clients_started }}/{{ eq_data.total_clients }} clientes</div>
+                                    <div class="text-xs text-gray-500">{{ eq_data.usage_rate|floatformat:0 }}% de uso</div>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ eq_data.usage_rate }}%"></div>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <div class="font-medium">{{ eq_data.clients_completed }}/{{ eq_data.clients_started }} concluídos</div>
+                                    <div class="text-xs text-gray-500">{{ eq_data.completion_rate|floatformat:0 }}% conclusão</div>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="{% if eq_data.completion_rate >= 80 %}bg-green-600{% elif eq_data.completion_rate >= 50 %}bg-yellow-500{% else %}bg-red-500{% endif %} h-2 rounded-full" style="width: {{ eq_data.completion_rate }}%"></div>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {% if eq_data.avg_completion_time %}
+                                    {{ eq_data.avg_completion_time|floatformat:1 }} dia{{ eq_data.avg_completion_time|floatformat:0|pluralize }}
+                                {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if eq_data.difficulty_score > 70 %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Alto ({{ eq_data.difficulty_score|floatformat:0 }}%)
+                                </span>
+                                {% elif eq_data.difficulty_score > 30 %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Médio ({{ eq_data.difficulty_score|floatformat:0 }}%)
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Baixo ({{ eq_data.difficulty_score|floatformat:0 }}%)
+                                </span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="flex items-center">
+                                    {% if eq_data.recent_activity > 0 %}
+                                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                    <span>{{ eq_data.recent_activity }} 
+                                    {% if eq_data.recent_activity == 1 %}ação{% else %}ações{% endif %}</span>
+                                    {% else %}
+                                    <div class="w-2 h-2 bg-gray-300 rounded-full mr-2"></div>
+                                    <span class="text-gray-400">Sem atividade</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="text-gray-500 mb-4">
+                    <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-4h-2M4 9h2" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum equipamento encontrado</h3>
+                <p class="text-gray-500">Tente ajustar os filtros ou cadastrar novos equipamentos.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

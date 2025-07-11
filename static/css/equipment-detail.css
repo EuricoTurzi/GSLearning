@@ -1,0 +1,583 @@
+/* GSLEARNING - static/css/equipment-detail.css */
+/* Estilos específicos para a página de detalhes do equipamento */
+
+/* ===== IMAGEM PRINCIPAL DO EQUIPAMENTO ===== */
+.equipment-main-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.equipment-main-image img {
+    width: 100%;
+    height: 16rem;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.equipment-main-image:hover img {
+    transform: scale(1.05);
+}
+
+/* ===== INFORMAÇÕES TÉCNICAS ===== */
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 0.875rem;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* ===== CÍRCULO DE PROGRESSO ===== */
+.progress-summary {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+
+.progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #3b82f6 0deg,
+        #3b82f6 calc(var(--progress, 0) * 3.6deg),
+        #e5e7eb calc(var(--progress, 0) * 3.6deg),
+        #e5e7eb 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: progressCircleRotate 2s ease-out;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-circle-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.progress-percentage {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3b82f6;
+    line-height: 1;
+}
+
+.progress-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+@keyframes progressCircleRotate {
+    from {
+        background: conic-gradient(
+            #e5e7eb 0deg,
+            #e5e7eb 360deg
+        );
+    }
+    to {
+        background: conic-gradient(
+            #3b82f6 0deg,
+            #3b82f6 calc(var(--progress, 0) * 3.6deg),
+            #e5e7eb calc(var(--progress, 0) * 3.6deg),
+            #e5e7eb 360deg
+        );
+    }
+}
+
+/* ===== MÓDULOS DE TREINAMENTO ===== */
+.module-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.module-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.module-item.completed {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border-color: #10b981;
+}
+
+.module-item.in_progress {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #3b82f6;
+}
+
+.module-item.locked {
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    border-color: #d1d5db;
+    opacity: 0.7;
+}
+
+/* ===== CONTEÚDO DO MÓDULO ===== */
+.module-content {
+    position: relative;
+    z-index: 1;
+}
+
+.module-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.module-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+}
+
+.module-number {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.module-item.completed .module-number {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+.module-item.locked .module-number {
+    background: linear-gradient(135deg, #6b7280, #374151);
+    box-shadow: 0 4px 6px -1px rgba(107, 114, 128, 0.3);
+}
+
+.module-details {
+    flex: 1;
+}
+
+.module-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.module-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.module-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.meta-item i {
+    color: #9ca3af;
+}
+
+/* ===== STATUS BADGES ===== */
+.module-status {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    transition: all 0.2s ease;
+}
+
+.status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.in-progress {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.status-badge.available {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.3);
+}
+
+.status-badge.locked {
+    background: linear-gradient(135deg, #6b7280, #374151);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(107, 114, 128, 0.3);
+}
+
+/* ===== PROGRESSO DO MÓDULO ===== */
+.module-progress {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 3px;
+    transition: width 0.8s ease-out;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+    background-size: 12px 12px;
+    animation: progressStripes 1s linear infinite;
+}
+
+@keyframes progressStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 12px 0; }
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    color: #3b82f6;
+    font-weight: 500;
+}
+
+/* ===== AÇÕES DO MÓDULO ===== */
+.module-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.module-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 140px;
+}
+
+.module-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.module-action:hover::before {
+    left: 100%;
+}
+
+.module-action.primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.module-action.primary:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4);
+    text-decoration: none;
+    color: white;
+}
+
+.module-action.secondary {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.module-action.secondary:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #1d4ed8;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.module-action.locked {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+    border: 1px solid #d1d5db;
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Aplicar animações */
+.module-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.module-item:nth-child(1) { animation-delay: 0.1s; }
+.module-item:nth-child(2) { animation-delay: 0.2s; }
+.module-item:nth-child(3) { animation-delay: 0.3s; }
+.module-item:nth-child(4) { animation-delay: 0.4s; }
+.module-item:nth-child(5) { animation-delay: 0.5s; }
+.module-item:nth-child(6) { animation-delay: 0.6s; }
+
+.equipment-main-image {
+    animation: slideInLeft 0.8s ease-out;
+}
+
+.progress-circle {
+    animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* ===== HOVER EFFECTS AVANÇADOS ===== */
+.module-item:hover .module-number {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.module-item:hover .status-badge {
+    transform: scale(1.05);
+}
+
+.module-item:hover .progress-fill {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .module-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .module-info {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .module-actions {
+        flex-direction: column;
+    }
+    
+    .module-action {
+        width: 100%;
+    }
+    
+    .progress-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .progress-percentage {
+        font-size: 1.25rem;
+    }
+    
+    .equipment-main-image img {
+        height: 12rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .module-item {
+        padding: 1rem;
+    }
+    
+    .module-title {
+        font-size: 1rem;
+    }
+    
+    .module-number {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.75rem;
+    }
+    
+    .status-badge {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.6875rem;
+    }
+    
+    .module-action {
+        padding: 0.625rem 1rem;
+        font-size: 0.8125rem;
+        min-width: 120px;
+    }
+}
+
+/* ===== ESTADOS ESPECIAIS ===== */
+.module-item.completed::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 30px 30px 0;
+    border-color: transparent #10b981 transparent transparent;
+}
+
+.module-item.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* ===== EFEITOS DE BRILHO ===== */
+.module-action.primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.module-action.primary:hover {
+    box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+}
+
+/* ===== CÍRCULO DE PROGRESSO COM JAVASCRIPT ===== */
+.progress-circle[data-progress="0"] {
+    background: conic-gradient(#e5e7eb 0deg, #e5e7eb 360deg);
+}
+
+.progress-circle[data-progress="25"] {
+    background: conic-gradient(#3b82f6 0deg, #3b82f6 90deg, #e5e7eb 90deg, #e5e7eb 360deg);
+}
+
+.progress-circle[data-progress="50"] {
+    background: conic-gradient(#3b82f6 0deg, #3b82f6 180deg, #e5e7eb 180deg, #e5e7eb 360deg);
+}
+
+.progress-circle[data-progress="75"] {
+    background: conic-gradient(#3b82f6 0deg, #3b82f6 270deg, #e5e7eb 270deg, #e5e7eb 360deg);
+}
+
+.progress-circle[data-progress="100"] {
+    background: conic-gradient(#10b981 0deg, #10b981 360deg);
+}
+
+/* ===== TEXTURAS SUTIS ===== */
+.module-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.module-item.completed::before {
+    background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+}

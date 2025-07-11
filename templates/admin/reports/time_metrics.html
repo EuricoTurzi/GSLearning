@@ -1,0 +1,363 @@
+<!-- GSLEARNING - templates/admin/reports/time_metrics.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Métricas de Tempo - GSLearning Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GS</span>
+                    </div>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">Learning</span>
+                    <span class="ml-4 text-sm text-gray-500">Admin - Métricas de Tempo</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'accounts:admin_dashboard' %}" class="text-gray-600 hover:text-gray-900 text-sm">← Dashboard</a>
+                    <a href="{% url 'accounts:client_progress_report' %}" class="text-gray-600 hover:text-gray-900 text-sm">Progresso</a>
+                    <a href="{% url 'accounts:equipment_analytics' %}" class="text-gray-600 hover:text-gray-900 text-sm">Analytics</a>
+                    <a href="{% url 'accounts:certificate_report' %}" class="text-gray-600 hover:text-gray-900 text-sm">Certificados</a>
+                    <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
+                    <a href="{% url 'accounts:logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header da página -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">⏱️ Relatório de Métricas de Tempo</h1>
+            <p class="mt-2 text-gray-600">Análise detalhada de tempos de treinamento e performance dos clientes</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">🔍 Filtros de Análise</h2>
+            </div>
+            <div class="p-6">
+                <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Período -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+                        <select name="period" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if period_filter == 'all' %}selected{% endif %}>Todos os períodos</option>
+                            <option value="week" {% if period_filter == 'week' %}selected{% endif %}>Últimos 7 dias</option>
+                            <option value="month" {% if period_filter == 'month' %}selected{% endif %}>Últimos 30 dias</option>
+                            <option value="year" {% if period_filter == 'year' %}selected{% endif %}>Último ano</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Categoria -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                        <select name="category" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if category_filter == 'all' %}selected{% endif %}>Todas as categorias</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Equipamento -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Equipamento</label>
+                        <select name="equipment" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if equipment_filter == 'all' %}selected{% endif %}>Todos os equipamentos</option>
+                            {% for equipment in equipments %}
+                            <option value="{{ equipment.id }}" {% if equipment_filter == equipment.id|stringformat:"s" %}selected{% endif %}>{{ equipment.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Métrica -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+                        <select name="metric" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="completion" {% if metric_type == 'completion' %}selected{% endif %}>Taxa de Conclusão</option>
+                            <option value="watch_time" {% if metric_type == 'watch_time' %}selected{% endif %}>Tempo Assistido</option>
+                            <option value="efficiency" {% if metric_type == 'efficiency' %}selected{% endif %}>Eficiência</option>
+                        </select>
+                    </div>
+                    
+                    <div class="md:col-span-4">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            🔍 Aplicar Filtros
+                        </button>
+                        <a href="{% url 'accounts:time_metrics_report' %}" class="ml-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
+                            🔄 Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Estatísticas Gerais -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">⏱️</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Tempo Total Assistido</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_watch_time_hours }}h</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">📊</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Tempo Médio/Módulo</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ avg_completion_minutes }}min</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">📅</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Dias para Completar</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ avg_days_to_complete }} dias</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">✅</span>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Módulos Concluídos</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_completed_modules }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análise por Equipamento -->
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">⚙️ Performance por Equipamento</h3>
+            </div>
+            {% if equipment_metrics %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipamento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tempo Esperado</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tempo Real</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eficiência</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dificuldade</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taxa Conclusão</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for equipment in equipment_metrics %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ equipment.equipment.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ equipment.equipment.category.name }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ equipment.expected_duration_minutes }}min
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ equipment.actual_time_minutes }}min
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ equipment.efficiency|floatformat:0 }}%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">{{ equipment.efficiency }}%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {% if equipment.difficulty_color == 'green' %}bg-green-100 text-green-800{% elif equipment.difficulty_color == 'yellow' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ equipment.difficulty_level }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ equipment.completion_rate }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-6 text-center text-gray-500">
+                Nenhum dado disponível para o período selecionado.
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Horários de Pico -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">🕐 Atividade por Horário</h3>
+                </div>
+                <div class="p-6">
+                    {% if peak_hour %}
+                    <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                            <span class="text-sm font-medium text-blue-900">Horário de Pico: {{ peak_hour }} ({{ peak_hour_count }} atividades)</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="space-y-2">
+                        {% for hour, count in hourly_activity.items %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">{{ hour }}</span>
+                            <div class="flex items-center">
+                                <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                                    {% if peak_hour_count > 0 %}
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: {% widthratio count peak_hour_count 100 %}%"></div>
+                                    {% endif %}
+                                </div>
+                                <span class="text-sm text-gray-900 w-8 text-right">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes Mais Eficientes -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">🏆 Top Clientes Eficientes</h3>
+                </div>
+                <div class="p-6">
+                    {% if top_efficient_clients %}
+                    <div class="space-y-4">
+                        {% for client_data in top_efficient_clients %}
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ client_data.client.get_full_name|default:client_data.client.username }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ client_data.completed_modules }} módulos • {{ client_data.total_time_hours }}h
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-green-600">{{ client_data.efficiency }}%</div>
+                                <div class="text-xs text-gray-500">eficiência</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-500 text-center">Nenhum dado disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tendências Mensais -->
+        {% if monthly_trends %}
+        <div class="bg-white shadow rounded-lg mt-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">📈 Tendências dos Últimos 6 Meses</h3>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 text-sm font-medium text-gray-700">Mês</th>
+                                <th class="text-left py-2 text-sm font-medium text-gray-700">Horas Totais</th>
+                                <th class="text-left py-2 text-sm font-medium text-gray-700">Módulos Concluídos</th>
+                                <th class="text-left py-2 text-sm font-medium text-gray-700">Média Diária</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for trend in monthly_trends %}
+                            <tr>
+                                <td class="py-3 text-sm text-gray-900">{{ trend.month }}</td>
+                                <td class="py-3 text-sm text-gray-900">{{ trend.total_hours }}h</td>
+                                <td class="py-3 text-sm text-gray-900">{{ trend.completed_modules }}</td>
+                                <td class="py-3 text-sm text-gray-500">{{ trend.avg_daily_hours }}h/dia</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Resumo da Análise -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-2">📋 Resumo da Análise</h3>
+            <div class="text-sm text-blue-800">
+                <p class="mb-2">
+                    <strong>Total de sessões analisadas:</strong> {{ total_analyzed_sessions }}
+                </p>
+                <p class="mb-2">
+                    <strong>Período:</strong> 
+                    {% if period_filter == 'week' %}Últimos 7 dias
+                    {% elif period_filter == 'month' %}Últimos 30 dias
+                    {% elif period_filter == 'year' %}Último ano
+                    {% else %}Todos os períodos{% endif %}
+                </p>
+                <p>
+                    <strong>Filtros aplicados:</strong>
+                    {% if category_filter != 'all' %}Categoria específica{% else %}Todas as categorias{% endif %} • 
+                    {% if equipment_filter != 'all' %}Equipamento específico{% else %}Todos os equipamentos{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

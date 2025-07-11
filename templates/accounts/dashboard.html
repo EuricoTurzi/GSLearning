@@ -1,0 +1,192 @@
+<!-- GSLEARNING - templates/accounts/dashboard.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - GSLearning{% endblock %}
+
+{% block meta_description %}Dashboard da plataforma GSLearning - Acesse seus treinamentos e acompanhe seu progresso{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block page_header %}
+<div class="bg-gradient-to-r from-primary-600 to-primary-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <i class="fas fa-tachometer-alt text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-white">
+                        Bem-vindo, {{ user.first_name|default:user.username }}!
+                    </h1>
+                    <p class="text-primary-100 text-lg">
+                        Continue seu aprendizado na plataforma GSLearning
+                    </p>
+                </div>
+            </div>
+            
+            <div class="hidden lg:flex items-center space-x-4">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <div class="text-primary-100 text-sm">Último acesso</div>
+                    <div class="text-white font-semibold">{{ user.last_login|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Cards de Progresso -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Equipamentos Disponíveis -->
+        <div class="dashboard-client-card primary">
+            <div class="card-icon">
+                <i class="fas fa-laptop text-3xl"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-number">{{ client_stats.available_equipment|default:0 }}</div>
+                <div class="card-title">Equipamentos</div>
+                <div class="card-subtitle">Disponíveis para você</div>
+                <a href="{% url 'equipment:list' %}" class="card-action">
+                    Ver Equipamentos <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Progresso Geral -->
+        <div class="dashboard-client-card success">
+            <div class="card-icon">
+                <i class="fas fa-chart-line text-3xl"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-number">{{ client_stats.completion_percentage|default:0 }}%</div>
+                <div class="card-title">Progresso</div>
+                <div class="card-subtitle">Total concluído</div>
+                <div class="progress-mini">
+                    <div class="progress-mini-fill" style="width: {{ client_stats.completion_percentage|default:0 }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificados -->
+        <div class="dashboard-client-card warning">
+            <div class="card-icon">
+                <i class="fas fa-award text-3xl"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-number">{{ client_stats.certificates_earned|default:0 }}</div>
+                <div class="card-title">Certificados</div>
+                <div class="card-subtitle">Conquistados</div>
+                <a href="#" class="card-action">
+                    Ver Certificados <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Treinamentos em Destaque -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-star text-yellow-500 mr-3"></i>
+                Continue Aprendendo
+            </h2>
+            <a href="{% url 'equipment:list' %}" class="text-primary-600 hover:text-primary-700 font-medium">
+                Ver Todos
+            </a>
+        </div>
+        
+        {% if user_equipment %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for equipment in user_equipment|slice:":3" %}
+            <div class="equipment-card">
+                <div class="equipment-image">
+                    {% if equipment.image %}
+                        <img src="{{ equipment.image.url }}" alt="{{ equipment.name }}" class="w-full h-32 object-cover">
+                    {% else %}
+                        <div class="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <i class="fas fa-{{ equipment.category.icon|default:'cog' }} text-3xl text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="equipment-content">
+                    <h3 class="equipment-title">{{ equipment.name }}</h3>
+                    <p class="equipment-category">{{ equipment.category.name }}</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="equipment-progress">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-600">Progresso</span>
+                            <span class="text-xs text-gray-600">{{ equipment.progress_percentage|default:0 }}%</span>
+                        </div>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill-mini" style="width: {{ equipment.progress_percentage|default:0 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'equipment:detail' equipment.pk %}" class="equipment-action">
+                        {% if equipment.progress_percentage == 0 %}
+                            Iniciar Treinamento
+                        {% elif equipment.progress_percentage == 100 %}
+                            Revisar Conteúdo
+                        {% else %}
+                            Continuar
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-4"></i>
+            <h3 class="text-lg font-medium mb-2">Nenhum equipamento disponível</h3>
+            <p class="text-sm">Entre em contato com o administrador para liberar seus treinamentos.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Últimas Atividades -->
+    {% if recent_progress %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-history text-primary-500 mr-3"></i>
+            Sua Atividade Recente
+        </h2>
+        
+        <div class="space-y-4">
+            {% for progress in recent_progress|slice:":5" %}
+            <div class="activity-timeline-item">
+                <div class="activity-timeline-marker {{ progress.status }}"></div>
+                <div class="activity-timeline-content">
+                    <div class="activity-timeline-title">
+                        {{ progress.title }}
+                    </div>
+                    <div class="activity-timeline-subtitle">
+                        {{ progress.equipment_name }} • {{ progress.date|date:"d/m/Y H:i" }}
+                    </div>
+                    {% if progress.percentage %}
+                    <div class="activity-timeline-progress">
+                        <div class="text-xs text-gray-500 mb-1">{{ progress.percentage }}% concluído</div>
+                        <div class="progress-bar-xs">
+                            <div class="progress-fill-xs" style="width: {{ progress.percentage }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

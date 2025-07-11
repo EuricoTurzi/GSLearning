@@ -1,0 +1,276 @@
+<!-- GSLEARNING - templates/admin/dashboard.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - GSLearning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GS</span>
+                    </div>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">Learning</span>
+                    <span class="ml-4 text-sm text-gray-500 bg-red-100 text-red-800 px-2 py-1 rounded">Admin</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'accounts:client_list' %}" class="text-gray-600 hover:text-gray-900 text-sm">Clientes</a>
+                    <a href="{% url 'equipment:admin_list' %}" class="text-gray-600 hover:text-gray-900 text-sm">Equipamentos</a>
+                    <a href="{% url 'training:admin_list' %}" class="text-gray-600 hover:text-gray-900 text-sm">Treinamentos</a>
+                    <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
+                    <a href="{% url 'accounts:logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header da página -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">📊 Dashboard Administrativo</h1>
+            <p class="text-gray-600">Visão geral completa da plataforma GSLearning</p>
+        </div>
+
+        <!-- Estatísticas principais -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total de Clientes -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-1a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total de Clientes</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_clients }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <div class="text-sm">
+                        <span class="text-green-600 font-medium">+{{ new_clients_week }}</span>
+                        <span class="text-gray-500"> esta semana</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total de Equipamentos -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-4h-2M4 9h2"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Equipamentos Ativos</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_equipments }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <div class="text-sm">
+                        <span class="text-blue-600 font-medium">{{ total_modules }}</span>
+                        <span class="text-gray-500"> módulos total</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificados Emitidos -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Certificados Emitidos</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ total_certificates }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <div class="text-sm">
+                        <span class="text-green-600 font-medium">+{{ certificates_week }}</span>
+                        <span class="text-gray-500"> esta semana</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Taxa de Conclusão -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Taxa de Conclusão</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ overall_completion_rate|floatformat:1 }}%</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3">
+                    <div class="text-sm">
+                        <span class="text-blue-600 font-medium">{{ active_clients }}</span>
+                        <span class="text-gray-500"> clientes ativos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de relatórios -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Equipamentos Mais Populares -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">🏆 Equipamentos Mais Populares</h3>
+                </div>
+                <div class="p-6">
+                    {% if popular_equipments %}
+                    <div class="space-y-4">
+                        {% for equipment in popular_equipments %}
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="text-blue-600 text-sm">{{ forloop.counter }}</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ equipment.name }}</div>
+                                    <div class="text-xs text-gray-500">{{ equipment.category.name }} - {{ equipment.model }}</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                {{ equipment.progress_count }} uso{{ equipment.progress_count|pluralize }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-500 text-center py-4">Nenhum dado disponível ainda</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Últimos Certificados -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">🎓 Últimos Certificados</h3>
+                </div>
+                <div class="p-6">
+                    {% if recent_certificates %}
+                    <div class="space-y-4">
+                        {% for certificate in recent_certificates %}
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ certificate.client.get_full_name|default:certificate.client.username }}</div>
+                                <div class="text-xs text-gray-500">{{ certificate.equipment.name }}</div>
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {{ certificate.issued_at|date:"d/m H:i" }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-500 text-center py-4">Nenhum certificado emitido ainda</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Criar Cliente -->
+            <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-medium text-gray-900">Novo Cliente</h3>
+                        <p class="text-sm text-gray-500">Cadastrar novo cliente na plataforma</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'accounts:client_create' %}" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium block text-center">
+                        Criar Cliente
+                    </a>
+                </div>
+            </div>
+
+            <!-- Novo Equipamento -->
+            <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-medium text-gray-900">Novo Equipamento</h3>
+                        <p class="text-sm text-gray-500">Adicionar equipamento ao catálogo</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'equipment:create' %}" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium block text-center">
+                        Criar Equipamento
+                    </a>
+                </div>
+            </div>
+
+            <!-- Relatórios -->
+            <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-medium text-gray-900">Relatórios</h3>
+                        <p class="text-sm text-gray-500">Ver relatórios detalhados</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'training:progress_report' %}" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium block text-center">
+                        Ver Relatórios
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

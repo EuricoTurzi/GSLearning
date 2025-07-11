@@ -1,0 +1,518 @@
+/* GSLEARNING - static/css/training-player.css */
+/* Estilos específicos para o player de treinamento */
+
+/* ===== CONTAINER DO VÍDEO ===== */
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* Aspect ratio 16:9 */
+    background: #000;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== OVERLAY DE STATUS ===== */
+.status-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* CORREÇÃO: permite cliques passarem pelo overlay */
+}
+
+.status-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.status-overlay.visible {
+    opacity: 1;
+    pointer-events: none; /* Mantém sem bloquear cliques */
+}
+
+.status-content {
+    text-align: center;
+    color: white;
+    max-width: 400px;
+    padding: 2rem;
+    pointer-events: auto; /* Só o conteúdo pode receber cliques se necessário */
+}
+
+.status-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.status-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.status-subtext {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== INDICADORES DE STATUS ===== */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.status-indicator.ready {
+    background: rgba(107, 114, 128, 0.2);
+    color: #d1d5db;
+}
+
+.status-indicator.playing {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status-indicator.paused {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
+}
+
+.status-indicator.inactive {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-indicator.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: statusDotPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusDotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== MINI STATUS DOTS ===== */
+.status-dot-mini {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot-mini.active {
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.status-dot-mini.inactive {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.status-dot-mini.ready {
+    background: #6b7280;
+}
+
+.status-dot-mini.playing {
+    background: #3b82f6;
+    animation: dotPulse 1s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* ===== BARRAS DE PROGRESSO ===== */
+.progress-container {
+    position: relative;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+    background-size: 16px 16px;
+    animation: progressStripes 1s linear infinite;
+}
+
+@keyframes progressStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 16px 0; }
+}
+
+.progress-minimum {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-right: 2px solid #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+    pointer-events: none;
+}
+
+.progress-minimum::after {
+    content: '95%';
+    position: absolute;
+    top: -24px;
+    right: -15px;
+    font-size: 0.75rem;
+    color: #fbbf24;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+/* ===== CRONÔMETRO ===== */
+#watchTime {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#currentTime {
+    color: #10b981;
+    font-weight: bold;
+}
+
+#totalTime {
+    color: #e5e7eb;
+}
+
+/* ===== ESTADOS DO PLAYER ===== */
+.video-container.playing .status-overlay {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.video-container.paused .status-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-container.inactive::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(239, 68, 68, 0.1);
+    z-index: 5;
+    animation: warningBlink 1s ease-in-out infinite;
+}
+
+@keyframes warningBlink {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* ===== NAVEGAÇÃO ENTRE MÓDULOS ===== */
+.module-nav-item {
+    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.module-nav-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateY(-2px);
+}
+
+.module-nav-item.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.module-nav-item.locked:hover {
+    transform: none;
+    background: transparent;
+}
+
+/* ===== CONTROLES CUSTOMIZADOS ===== */
+video::-webkit-media-controls-panel {
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-pause-button {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border-radius: 50%;
+    margin: 0 8px;
+}
+
+video::-webkit-media-controls-timeline {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    margin: 0 8px;
+}
+
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+/* ===== ANIMAÇÕES DE ENTRADA ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.video-container {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.status-indicator {
+    animation: slideInLeft 0.6s ease-out 0.3s both;
+}
+
+#watchTime {
+    animation: slideInLeft 0.6s ease-out 0.5s both;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .video-container {
+        padding-bottom: 75%; /* Aspect ratio mais quadrado no mobile */
+    }
+    
+    .status-content {
+        padding: 1rem;
+    }
+    
+    .status-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .status-text {
+        font-size: 1.25rem;
+    }
+    
+    .status-subtext {
+        font-size: 0.875rem;
+    }
+    
+    #watchTime {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .progress-minimum::after {
+        font-size: 0.6875rem;
+        right: -12px;
+        top: -20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .status-indicator {
+        font-size: 0.8125rem;
+        padding: 0.375rem 0.625rem;
+    }
+    
+    .progress-bar {
+        height: 6px;
+    }
+    
+    .module-nav-item {
+        padding: 0.75rem;
+    }
+}
+
+/* ===== EFEITOS ESPECIAIS ===== */
+.progress-fill.completed {
+    background: linear-gradient(90deg, #10b981, #059669);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+    animation: completionGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes completionGlow {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); 
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.8), 0 0 35px rgba(16, 185, 129, 0.3); 
+    }
+}
+
+/* ===== CONTROLE ANTI-BURLA ===== */
+.anti-cheat-panel {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.anti-cheat-panel h3 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== LOADING STATES ===== */
+.video-container.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    border-top: 3px solid #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 15;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== TEMA ESCURO PARA PAINÉIS ===== */
+.bg-gray-900 {
+    background: linear-gradient(135deg, #1f2937, #111827) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== EFEITOS DE SUCESSO ===== */
+.completion-celebration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+    z-index: 20;
+    animation: celebrationPulse 0.8s ease-out;
+}
+
+@keyframes celebrationPulse {
+    0% { 
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% { 
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+/* ===== CONTROLES BLOQUEADOS ===== */
+video.blocked {
+    pointer-events: none;
+    filter: grayscale(0.5) brightness(0.7);
+}
+
+video.blocked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    z-index: 10;
+}

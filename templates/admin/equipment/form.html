@@ -1,0 +1,246 @@
+<!-- GSLEARNING - templates/admin/equipment/form.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title|default:"Equipamento" }} - GSLearning Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GS</span>
+                    </div>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">Learning</span>
+                    <span class="ml-4 text-sm text-gray-500">Admin</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'accounts:dashboard' %}" class="text-gray-600 hover:text-gray-900 text-sm">Dashboard</a>
+                    <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
+                    <a href="{% url 'accounts:logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% elif message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700{% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %} px-4 py-3 rounded-md mb-2">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Header da página -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ title|default:"Novo Equipamento" }}</h1>
+                    <p class="text-gray-600">Cadastre os detalhes do equipamento</p>
+                </div>
+                <a href="{% url 'equipment:admin_list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    ← Voltar
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulário -->
+        <div class="bg-white shadow rounded-lg">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Categoria -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Categoria *
+                        </label>
+                        <select 
+                            name="{{ form.category.name }}" 
+                            id="{{ form.category.id_for_label }}"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">Selecione uma categoria</option>
+                            {% for value, text in form.category.field.choices %}
+                                {% if value %}
+                                <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+                                    {{ text }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        {% if form.category.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Nome -->
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nome do Equipamento *
+                        </label>
+                        <input 
+                            type="text" 
+                            name="{{ form.name.name }}" 
+                            id="{{ form.name.id_for_label }}"
+                            value="{{ form.name.value|default:'' }}"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: Isca Premium X1"
+                        >
+                        {% if form.name.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Modelo -->
+                    <div>
+                        <label for="{{ form.model.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Modelo *
+                        </label>
+                        <input 
+                            type="text" 
+                            name="{{ form.model.name }}" 
+                            id="{{ form.model.id_for_label }}"
+                            value="{{ form.model.value|default:'' }}"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: X1-2024"
+                        >
+                        {% if form.model.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Duração Estimada -->
+                    <div>
+                        <label for="{{ form.estimated_duration.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Duração Estimada (minutos) *
+                        </label>
+                        <input 
+                            type="number" 
+                            name="{{ form.estimated_duration.name }}" 
+                            id="{{ form.estimated_duration.id_for_label }}"
+                            value="{{ form.estimated_duration.value|default:'' }}"
+                            min="1"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="30"
+                        >
+                        <div class="mt-1 text-sm text-gray-500">
+                            Tempo estimado total do treinamento
+                        </div>
+                        {% if form.estimated_duration.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.estimated_duration.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Ordem -->
+                    <div>
+                        <label for="{{ form.order.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Ordem de Exibição
+                        </label>
+                        <input 
+                            type="number" 
+                            name="{{ form.order.name }}" 
+                            id="{{ form.order.id_for_label }}"
+                            value="{{ form.order.value|default:'0' }}"
+                            min="0"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="0"
+                        >
+                        {% if form.order.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.order.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Imagem -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Imagem do Equipamento
+                        </label>
+                        <input 
+                            type="file" 
+                            name="{{ form.image.name }}" 
+                            id="{{ form.image.id_for_label }}"
+                            accept="image/*"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                        <div class="mt-1 text-sm text-gray-500">
+                            Formatos aceitos: JPG, PNG, GIF (máx. 2MB)
+                        </div>
+                        {% if form.image.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.image.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Descrição Técnica
+                        </label>
+                        <textarea 
+                            name="{{ form.description.name }}" 
+                            id="{{ form.description.id_for_label }}"
+                            rows="4"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Descreva as características técnicas do equipamento..."
+                        >{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Status Ativo -->
+                    <div class="md:col-span-2">
+                        <div class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                name="{{ form.is_active.name }}" 
+                                id="{{ form.is_active.id_for_label }}"
+                                {% if form.is_active.value %}checked{% endif %}
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            >
+                            <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-900">
+                                Equipamento ativo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'equipment:admin_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        {% if object %}Atualizar{% else %}Criar{% endif %} Equipamento
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dicas -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
+            <h3 class="text-sm font-medium text-blue-800 mb-2">💡 Dicas</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• Use nomes descritivos como "Isca Premium X1" ou "Cadeado Digital Pro"</li>
+                <li>• O modelo deve ser único dentro da categoria</li>
+                <li>• A duração estimada ajuda os clientes a planejarem o treinamento</li>
+                <li>• Imagens claras melhoram a experiência do usuário</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!-- GSLEARNING - templates/base/base_auth.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}GSLearning - Acesso à Plataforma de Treinamento{% endblock %}">
+    <title>{% block title %}GSLearning{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% load static %}{% static 'css/base_auth.css' %}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% load static %}{% static 'img/favicon.ico' %}">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-30">
+        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.1) 1px, transparent 0); background-size: 20px 20px;"></div>
+    </div>
+
+    <!-- Floating Elements (decoração) -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-primary-200 rounded-full opacity-20 animate-float"></div>
+    <div class="absolute top-40 right-20 w-16 h-16 bg-secondary-200 rounded-full opacity-20 animate-float" style="animation-delay: 1s;"></div>
+    <div class="absolute bottom-40 left-20 w-12 h-12 bg-primary-300 rounded-full opacity-20 animate-float" style="animation-delay: 2s;"></div>
+    <div class="absolute bottom-20 right-40 w-24 h-24 bg-secondary-300 rounded-full opacity-20 animate-float" style="animation-delay: 0.5s;"></div>
+
+    <!-- Main Container -->
+    <div class="relative min-h-screen flex flex-col">
+        <!-- Header Simples -->
+        <header class="relative z-10 p-6">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">GSLearning</h1>
+                        <p class="text-sm text-gray-600">Plataforma de Treinamento</p>
+                    </div>
+                </div>
+
+                <!-- Status/Version -->
+                <div class="hidden sm:block text-right">
+                    <p class="text-sm text-gray-500">Versão 1.0</p>
+                    <p class="text-xs text-gray-400">Sistema Online</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+            <div class="w-full max-w-md animate-slide-up">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer Simples -->
+        <footer class="relative z-10 p-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center space-y-4">
+                    <!-- Links de Ajuda -->
+                    <div class="flex justify-center space-x-6 text-sm">
+                        <a href="#" class="text-gray-600 hover:text-primary-600 transition-colors">
+                            <i class="fas fa-question-circle mr-1"></i>Central de Ajuda
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-primary-600 transition-colors">
+                            <i class="fas fa-envelope mr-1"></i>Contato
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-primary-600 transition-colors">
+                            <i class="fas fa-shield-alt mr-1"></i>Privacidade
+                        </a>
+                    </div>
+
+                    <!-- Copyright -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <p class="text-sm text-gray-500">
+                            © 2025 GSLearning. Todos os direitos reservados.
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Desenvolvido para modernizar o treinamento de equipamentos técnicos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Messages/Alerts -->
+    {% if messages %}
+        <div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+            {% for message in messages %}
+                <div class="animate-slide-up p-4 rounded-lg shadow-lg border-l-4 {% if message.tags == 'error' %}bg-red-50 border-red-400 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-400 text-green-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-400 text-yellow-800{% else %}bg-blue-50 border-blue-400 text-blue-800{% endif %}">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3 text-sm">
+                            {{ message }}
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" 
+                                class="ml-auto text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Loading Overlay (se necessário) -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="{% load static %}{% static 'js/base_auth.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- CSS Styles -->
+    <style>
+        /* Form improvements */
+        input:focus, select:focus, textarea:focus {
+            @apply ring-2 ring-primary-500 ring-opacity-50 border-primary-500 outline-none;
+        }
+
+        /* Button styles */
+        .btn-primary {
+            @apply bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50;
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Form field styles */
+        .form-input {
+            @apply block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors bg-white;
+        }
+
+        .form-input-icon {
+            @apply block w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors bg-white;
+        }
+
+        /* Error styles */
+        .form-error {
+            @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+        }
+
+        /* Success styles */
+        .form-success {
+            @apply border-green-300 focus:ring-green-500 focus:border-green-500;
+        }
+
+        /* Auto-hide messages after 5 seconds */
+        .message-auto-hide {
+            animation: fadeOut 0.5s ease-in-out 5s forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        /* Background pattern animation */
+        .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(59, 130, 246, 0.1) 2px, transparent 0),
+                radial-gradient(circle at 75px 75px, rgba(147, 197, 253, 0.1) 1px, transparent 0);
+            background-size: 100px 100px;
+            animation: bgMove 20s linear infinite;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+    </style>
+
+    <script>
+        // Auto-hide messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('[class*="bg-red-50"], [class*="bg-green-50"], [class*="bg-yellow-50"], [class*="bg-blue-50"]');
+            messages.forEach(message => {
+                message.classList.add('message-auto-hide');
+            });
+        });
+
+        // Loading overlay functions
+        function showLoading() {
+            document.getElementById('loading-overlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+        }
+
+        // Form submission loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    showLoading();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

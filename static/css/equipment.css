@@ -1,0 +1,490 @@
+/* GSLEARNING - static/css/equipment.css */
+/* Estilos específicos para a lista de equipamentos do cliente */
+
+/* ===== FILTROS E BUSCA ===== */
+.equipment-filter,
+.equipment-search {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.equipment-filter:focus,
+.equipment-search:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.equipment-search {
+    min-width: 250px;
+}
+
+/* ===== CARDS DE EQUIPAMENTO ===== */
+.equipment-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.equipment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #3b82f6;
+}
+
+/* ===== IMAGEM DO EQUIPAMENTO ===== */
+.equipment-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.equipment-image img {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.equipment-card:hover .equipment-image img {
+    transform: scale(1.05);
+}
+
+.equipment-image .fas {
+    transition: all 0.3s ease;
+}
+
+.equipment-card:hover .equipment-image .fas {
+    transform: scale(1.1) rotate(5deg);
+    color: #3b82f6 !important;
+}
+
+/* ===== STATUS BADGE ===== */
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.status-badge.in_progress {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.status-badge.not_started {
+    background: linear-gradient(135deg, #6b7280, #374151);
+}
+
+/* ===== CONTEÚDO DO CARD ===== */
+.equipment-content {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #1f2937, #374151);
+    color: white;
+}
+
+/* ===== HEADER DO EQUIPAMENTO ===== */
+.equipment-header {
+    margin-bottom: 1rem;
+}
+
+.equipment-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
+}
+
+.equipment-category {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* ===== INFORMAÇÕES DO EQUIPAMENTO ===== */
+.equipment-info {
+    margin-bottom: 1rem;
+    space-y: 0.5rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+}
+
+/* ===== PROGRESSO ===== */
+.equipment-progress {
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.progress-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-percentage {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #10b981;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 4px;
+    transition: width 0.8s ease-out;
+    position: relative;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+    background-size: 16px 16px;
+    animation: progressStripes 1s linear infinite;
+}
+
+@keyframes progressStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 16px 0; }
+}
+
+.progress-details {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.progress-details .text-xs {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* ===== AÇÕES DO EQUIPAMENTO ===== */
+.equipment-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.equipment-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.equipment-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.equipment-action:hover::before {
+    left: 100%;
+}
+
+.equipment-action.primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.equipment-action.primary:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4);
+    text-decoration: none;
+    color: white;
+}
+
+.equipment-action.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.equipment-action.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Aplicar animações */
+.equipment-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.equipment-card:nth-child(1) { animation-delay: 0.1s; }
+.equipment-card:nth-child(2) { animation-delay: 0.2s; }
+.equipment-card:nth-child(3) { animation-delay: 0.3s; }
+.equipment-card:nth-child(4) { animation-delay: 0.4s; }
+.equipment-card:nth-child(5) { animation-delay: 0.5s; }
+.equipment-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* ===== FILTROS ANIMADOS ===== */
+.equipment-card.filtered-out {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.equipment-card.filtered-in {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* ===== ESTADOS ESPECIAIS ===== */
+#noResults {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+/* ===== LOADING STATES ===== */
+.equipment-card.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.equipment-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: loadingShimmer 1.5s infinite;
+}
+
+@keyframes loadingShimmer {
+    100% { left: 100%; }
+}
+
+/* ===== HOVER EFFECTS AVANÇADOS ===== */
+.equipment-card:hover .equipment-title {
+    color: #93c5fd;
+    text-shadow: 0 0 10px rgba(147, 197, 253, 0.3);
+}
+
+.equipment-card:hover .equipment-category {
+    background: rgba(59, 130, 246, 0.3);
+    color: #dbeafe;
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.equipment-card:hover .progress-fill {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .equipment-content {
+        padding: 1rem;
+    }
+    
+    .equipment-image img {
+        height: 10rem;
+    }
+    
+    .equipment-actions {
+        gap: 0.5rem;
+    }
+    
+    .equipment-action {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+    
+    .equipment-search {
+        min-width: 200px;
+    }
+    
+    .progress-percentage {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .equipment-image img {
+        height: 8rem;
+    }
+    
+    .equipment-title {
+        font-size: 1rem;
+    }
+    
+    .info-item {
+        padding: 0.375rem 0;
+    }
+    
+    .equipment-progress {
+        padding: 0.75rem;
+    }
+    
+    .status-badge {
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.6875rem;
+    }
+}
+
+/* ===== MICRO-INTERAÇÕES ===== */
+.equipment-action i {
+    transition: transform 0.2s ease;
+}
+
+.equipment-action:hover i {
+    transform: scale(1.1);
+}
+
+.status-badge {
+    transition: all 0.3s ease;
+}
+
+.equipment-card:hover .status-badge {
+    transform: scale(1.05);
+}
+
+/* ===== GRADIENTES E TEXTURAS ===== */
+.equipment-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+/* ===== EFEITOS DE BRILHO ===== */
+.equipment-card:hover .equipment-content {
+    background: linear-gradient(135deg, #1e40af, #3730a3);
+}
+
+.equipment-card:hover .progress-fill {
+    animation: progressGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes progressGlow {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); 
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.8), 0 0 35px rgba(16, 185, 129, 0.3); 
+    }
+}

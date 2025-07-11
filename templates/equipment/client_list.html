@@ -1,0 +1,236 @@
+<!-- GSLEARNING - templates/equipment/client_list.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Equipamentos - GSLearning{% endblock %}
+
+{% block meta_description %}Acesse seus equipamentos de treinamento na plataforma GSLearning{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipment.css' %}">
+{% endblock %}
+
+{% block page_header %}
+<div class="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <i class="fas fa-laptop text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Meus Equipamentos</h1>
+                    <p class="text-blue-100 text-lg">Selecione um equipamento para iniciar o treinamento</p>
+                </div>
+            </div>
+            
+            <div class="hidden lg:flex items-center space-x-4">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <div class="text-blue-100 text-sm">Total disponível</div>
+                    <div class="text-white font-semibold">{{ equipments.count }} equipamento{{ equipments.count|pluralize }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Filtros e Busca -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-filter text-gray-400"></i>
+                    <span class="text-sm font-medium text-gray-700">Filtrar por:</span>
+                </div>
+                <select class="equipment-filter border-gray-300 rounded-md text-sm" data-filter="category">
+                    <option value="all">Todas as categorias</option>
+                    {% for category in categories %}
+                    <option value="{{ category.slug }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <select class="equipment-filter border-gray-300 rounded-md text-sm" data-filter="status">
+                    <option value="all">Todos os status</option>
+                    <option value="not_started">Não iniciado</option>
+                    <option value="in_progress">Em progresso</option>
+                    <option value="completed">Concluído</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <div class="relative">
+                    <input type="text" 
+                           placeholder="Buscar equipamento..." 
+                           class="equipment-search border-gray-300 rounded-md pl-10 pr-4 py-2 text-sm"
+                           id="equipmentSearch">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Equipamentos -->
+    {% if equipments %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="equipmentGrid">
+        {% for equipment in equipments %}
+        <div class="equipment-card" 
+             data-category="{{ equipment.category.slug }}" 
+             data-status="{{ equipment.status|default:'not_started' }}"
+             data-name="{{ equipment.name|lower }}">
+            
+            <!-- Imagem do Equipamento -->
+            <div class="equipment-image">
+                {% if equipment.image %}
+                    <img src="{{ equipment.image.url }}" alt="{{ equipment.name }}" class="w-full h-48 object-cover">
+                {% else %}
+                    <div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <i class="fas fa-{{ equipment.category.icon|default:'cog' }} text-4xl text-gray-400"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Badge de Status -->
+                <div class="status-badge {{ equipment.status|default:'not_started' }}">
+                    {% if equipment.progress_percentage == 100 %}
+                        <i class="fas fa-check"></i> Concluído
+                    {% elif equipment.progress_percentage > 0 %}
+                        <i class="fas fa-play"></i> {{ equipment.progress_percentage }}%
+                    {% else %}
+                        <i class="fas fa-clock"></i> Não iniciado
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Conteúdo do Card -->
+            <div class="equipment-content">
+                <!-- Header -->
+                <div class="equipment-header">
+                    <h3 class="equipment-title">{{ equipment.name }}</h3>
+                    <span class="equipment-category">{{ equipment.category.name }}</span>
+                </div>
+                
+                <!-- Informações -->
+                <div class="equipment-info">
+                    {% if equipment.model %}
+                    <div class="info-item">
+                        <span class="info-label">Modelo:</span>
+                        <span class="info-value">{{ equipment.model }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if equipment.serial_number %}
+                    <div class="info-item">
+                        <span class="info-label">Série:</span>
+                        <span class="info-value">{{ equipment.serial_number }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-item">
+                        <span class="info-label">Módulos:</span>
+                        <span class="info-value">{{ equipment.total_modules|default:0 }} módulo{{ equipment.total_modules|pluralize }}</span>
+                    </div>
+                </div>
+                
+                <!-- Progresso -->
+                <div class="equipment-progress">
+                    <div class="progress-header">
+                        <span class="progress-label">Progresso do Treinamento</span>
+                        <span class="progress-percentage">{{ equipment.progress_percentage|default:0 }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ equipment.progress_percentage|default:0 }}%"></div>
+                    </div>
+                    <div class="progress-details">
+                        <span class="text-xs text-gray-500">
+                            {{ equipment.completed_modules|default:0 }} de {{ equipment.total_modules|default:0 }} módulos concluídos
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Ações -->
+                <div class="equipment-actions">
+                    <a href="{% url 'equipment:detail' equipment.pk %}" class="equipment-action primary">
+                        {% if equipment.progress_percentage == 100 %}
+                            <i class="fas fa-redo"></i>
+                            Revisar Conteúdo
+                        {% elif equipment.progress_percentage > 0 %}
+                            <i class="fas fa-play"></i>
+                            Continuar Treinamento
+                        {% else %}
+                            <i class="fas fa-rocket"></i>
+                            Iniciar Treinamento
+                        {% endif %}
+                    </a>
+                    
+                    {% if equipment.progress_percentage == 100 %}
+                    <a href="#" class="equipment-action secondary">
+                        <i class="fas fa-certificate"></i>
+                        Ver Certificado
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Sem Resultados -->
+    <div id="noResults" class="hidden text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <i class="fas fa-search text-4xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum equipamento encontrado</h3>
+        <p class="text-gray-500">Tente ajustar os filtros ou termos de busca.</p>
+    </div>
+    
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="text-center py-16">
+        <div class="text-gray-400 mb-6">
+            <i class="fas fa-inbox text-6xl"></i>
+        </div>
+        <h3 class="text-xl font-medium text-gray-900 mb-4">Nenhum equipamento disponível</h3>
+        <p class="text-gray-500 mb-6">Você ainda não possui equipamentos associados para treinamento.</p>
+        <div class="space-y-2 text-sm text-gray-400">
+            <p>• Entre em contato com o administrador para liberar seus equipamentos</p>
+            <p>• Verifique se sua conta está ativa e configurada corretamente</p>
+        </div>
+        <div class="mt-8">
+            <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Dicas de Navegação -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-indigo-900 mb-4">💡 Dicas de Navegação</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-indigo-800">
+            <div class="flex items-start space-x-2">
+                <span class="text-indigo-600">•</span>
+                <span>Clique em "Iniciar Treinamento" para começar os módulos do equipamento</span>
+            </div>
+            <div class="flex items-start space-x-2">
+                <span class="text-indigo-600">•</span>
+                <span>Use os filtros para encontrar equipamentos específicos rapidamente</span>
+            </div>
+            <div class="flex items-start space-x-2">
+                <span class="text-indigo-600">•</span>
+                <span>Seu progresso é salvo automaticamente em cada módulo</span>
+            </div>
+            <div class="flex items-start space-x-2">
+                <span class="text-indigo-600">•</span>
+                <span>Complete todos os módulos para receber seu certificado</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/equipment.js' %}"></script>
+{% endblock %}
