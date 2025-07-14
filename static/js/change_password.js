@@ -1,515 +1,430 @@
 /* GSLEARNING - static/js/change_password.js */
 /* JavaScript específico para a página de alteração de senha */
 
-(function() {
-    'use strict';
-
-    // ===== CONFIGURAÇÕES GLOBAIS =====
-    const CONFIG = {
-        MIN_PASSWORD_LENGTH: 8,
-        STRENGTH_CHECK_DELAY: 300,
-        MATCH_CHECK_DELAY: 200,
-        SUBMIT_DEBOUNCE: 1000
-    };
-
-    // ===== CLASSE PRINCIPAL =====
-    class PasswordChangeManager {
-        constructor() {
-            this.init();
-        }
-
-        init() {
-            this.elements = this.getElements();
-            this.state = {
-                passwordStrength: 0,
-                passwordsMatch: false,
-                isSubmitting: false
-            };
-            
-            this.bindEvents();
-            this.setupPasswordToggles();
-            this.setupPasswordValidation();
-            this.setupFormValidation();
-            
-            console.log('🔒 Password Change Manager iniciado');
-        }
-
-        getElements() {
-            return {
-                form: document.getElementById('passwordForm'),
-                oldPassword: document.querySelector('input[name="old_password"]'),
-                newPassword1: document.querySelector('input[name="new_password1"]'),
-                newPassword2: document.querySelector('input[name="new_password2"]'),
-                strengthBar: document.getElementById('strengthFill'),
-                strengthText: document.getElementById('strengthText'),
-                matchIndicator: document.getElementById('passwordMatch'),
-                submitBtn: document.getElementById('submitBtn'),
-                toggleButtons: document.querySelectorAll('.password-toggle')
-            };
-        }
-
-        bindEvents() {
-            // Eventos de input nos campos de senha
-            if (this.elements.newPassword1) {
-                this.elements.newPassword1.addEventListener('input', 
-                    this.debounce(() => this.checkPasswordStrength(), CONFIG.STRENGTH_CHECK_DELAY)
-                );
-            }
-
-            if (this.elements.newPassword2) {
-                this.elements.newPassword2.addEventListener('input', 
-                    this.debounce(() => this.checkPasswordMatch(), CONFIG.MATCH_CHECK_DELAY)
-                );
-            }
-
-            // Evento de submit do formulário
-            if (this.elements.form) {
-                this.elements.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
-            }
-
-            // Eventos de teclado para acessibilidade
-            document.addEventListener('keydown', (e) => this.handleKeyboardEvents(e));
-        }
-
-        setupPasswordToggles() {
-            this.elements.toggleButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.togglePasswordVisibility(button);
-                });
-            });
-        }
-
-        togglePasswordVisibility(button) {
-            const targetId = button.getAttribute('data-target');
-            const targetInput = document.getElementById(targetId);
-            
-            if (targetInput) {
-                const isPassword = targetInput.type === 'password';
-                
-                // Alternar tipo do input
-                targetInput.type = isPassword ? 'text' : 'password';
-                
-                // Alternar ícone
-                const icon = button.querySelector('i');
-                if (icon) {
-                    icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
-                }
-                
-                // Alternar classe ativa
-                button.classList.toggle('active', isPassword);
-                
-                // Feedback de acessibilidade
-                button.setAttribute('aria-label', 
-                    isPassword ? 'Ocultar senha' : 'Mostrar senha'
-                );
-                
-                // Efeito visual
-                this.addRippleEffect(button);
-            }
-        }
-
-        setupPasswordValidation() {
-            // Configurar validação em tempo real
-            if (this.elements.newPassword1) {
-                this.elements.newPassword1.addEventListener('input', () => {
-                    this.checkPasswordStrength();
-                    this.checkPasswordMatch(); // Também verificar match quando senha1 muda
-                });
-            }
-
-            if (this.elements.newPassword2) {
-                this.elements.newPassword2.addEventListener('input', () => {
-                    this.checkPasswordMatch();
-                });
-            }
-        }
-
-        checkPasswordStrength() {
-            const password = this.elements.newPassword1?.value || '';
-            const strength = this.calculatePasswordStrength(password);
-            
-            this.state.passwordStrength = strength.score;
-            this.updateStrengthIndicator(strength);
-            this.updateFormValidation();
-        }
-
-        calculatePasswordStrength(password) {
-            let score = 0;
-            let feedback = [];
-            
-            // Critérios de força
-            const criteria = {
-                length: password.length >= CONFIG.MIN_PASSWORD_LENGTH,
-                lowercase: /[a-z]/.test(password),
-                uppercase: /[A-Z]/.test(password),
-                numbers: /\d/.test(password),
-                symbols: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
-            };
-            
-            // Calcular pontuação
-            Object.values(criteria).forEach(met => {
-                if (met) score++;
-            });
-            
-            // Determinar nível e cor
-            let level, color, message;
-            
-            if (password.length === 0) {
-                level = 'empty';
-                color = 'weak';
-                message = 'Digite uma senha';
-            } else if (score < 2) {
-                level = 'weak';
-                color = 'weak';
-                message = 'Senha muito fraca';
-            } else if (score < 3) {
-                level = 'fair';
-                color = 'fair';
-                message = 'Senha fraca';
-            } else if (score < 4) {
-                level = 'good';
-                color = 'good';
-                message = 'Senha boa';
-            } else {
-                level = 'strong';
-                color = 'strong';
-                message = 'Senha forte';
-            }
-            
-            return { score, level, color, message, criteria };
-        }
-
-        updateStrengthIndicator(strength) {
-            if (this.elements.strengthBar && this.elements.strengthText) {
-                // Atualizar barra
-                this.elements.strengthBar.className = `strength-fill ${strength.color}`;
-                
-                // Atualizar texto
-                this.elements.strengthText.textContent = strength.message;
-                this.elements.strengthText.className = `strength-text ${strength.color}`;
-                
-                // Adicionar ícone baseado no nível
-                const icon = this.getStrengthIcon(strength.level);
-                this.elements.strengthText.innerHTML = `${icon} ${strength.message}`;
-            }
-        }
-
-        getStrengthIcon(level) {
-            const icons = {
-                empty: '<i class="fas fa-circle-notch fa-spin"></i>',
-                weak: '<i class="fas fa-exclamation-triangle"></i>',
-                fair: '<i class="fas fa-minus-circle"></i>',
-                good: '<i class="fas fa-check-circle"></i>',
-                strong: '<i class="fas fa-shield-alt"></i>'
-            };
-            return icons[level] || icons.empty;
-        }
-
-        checkPasswordMatch() {
-            const password1 = this.elements.newPassword1?.value || '';
-            const password2 = this.elements.newPassword2?.value || '';
-            
-            let match = false;
-            let message = '';
-            let icon = '';
-            
-            if (password2.length === 0) {
-                message = 'Confirme sua senha';
-                icon = '<i class="fas fa-circle-notch fa-spin"></i>';
-            } else if (password1 === password2) {
-                match = true;
-                message = 'Senhas coincidem';
-                icon = '<i class="fas fa-check-circle"></i>';
-            } else {
-                match = false;
-                message = 'Senhas não coincidem';
-                icon = '<i class="fas fa-times-circle"></i>';
-            }
-            
-            this.state.passwordsMatch = match;
-            this.updateMatchIndicator(match, message, icon);
-            this.updateFormValidation();
-        }
-
-        updateMatchIndicator(match, message, icon) {
-            if (this.elements.matchIndicator) {
-                this.elements.matchIndicator.innerHTML = `${icon} <span>${message}</span>`;
-                
-                // Remover classes anteriores
-                this.elements.matchIndicator.classList.remove('match', 'no-match');
-                
-                // Adicionar classe apropriada
-                if (this.elements.newPassword2?.value) {
-                    this.elements.matchIndicator.classList.add(match ? 'match' : 'no-match');
-                }
-            }
-        }
-
-        setupFormValidation() {
-            // Validação em tempo real dos campos
-            this.elements.form?.querySelectorAll('input').forEach(input => {
-                input.addEventListener('blur', () => this.validateField(input));
-                input.addEventListener('input', () => this.clearFieldError(input));
-            });
-        }
-
-        validateField(input) {
-            const formGroup = input.closest('.form-group');
-            const value = input.value.trim();
-            
-            // Remover estados anteriores
-            formGroup?.classList.remove('success', 'error');
-            
-            // Validar baseado no tipo de campo
-            let isValid = true;
-            
-            if (input.name === 'old_password') {
-                isValid = value.length > 0;
-            } else if (input.name === 'new_password1') {
-                isValid = this.state.passwordStrength >= 2; // Pelo menos 'fair'
-            } else if (input.name === 'new_password2') {
-                isValid = this.state.passwordsMatch;
-            }
-            
-            // Aplicar classe visual
-            formGroup?.classList.add(isValid ? 'success' : 'error');
-            
-            return isValid;
-        }
-
-        clearFieldError(input) {
-            const formGroup = input.closest('.form-group');
-            formGroup?.classList.remove('error');
-        }
-
-        updateFormValidation() {
-            const isValid = this.isFormValid();
-            
-            if (this.elements.submitBtn) {
-                this.elements.submitBtn.disabled = !isValid;
-                this.elements.submitBtn.classList.toggle('opacity-50', !isValid);
-                this.elements.submitBtn.classList.toggle('cursor-not-allowed', !isValid);
-            }
-        }
-
-        isFormValid() {
-            const hasOldPassword = this.elements.oldPassword?.value.trim().length > 0;
-            const hasStrongPassword = this.state.passwordStrength >= 2;
-            const passwordsMatch = this.state.passwordsMatch;
-            
-            return hasOldPassword && hasStrongPassword && passwordsMatch;
-        }
-
-        handleFormSubmit(e) {
-            if (this.state.isSubmitting) {
-                e.preventDefault();
-                return;
-            }
-
-            // Validar formulário final
-            if (!this.isFormValid()) {
-                e.preventDefault();
-                this.showValidationErrors();
-                return;
-            }
-
-            // Mostrar loading
-            this.setSubmitLoading(true);
-            
-            // Permitir envio (não prevenir default)
-            console.log('✅ Formulário válido, enviando...');
-        }
-
-        setSubmitLoading(loading) {
-            this.state.isSubmitting = loading;
-            
-            if (this.elements.submitBtn) {
-                this.elements.submitBtn.classList.toggle('loading', loading);
-                this.elements.submitBtn.disabled = loading;
-                
-                const icon = this.elements.submitBtn.querySelector('i');
-                if (icon) {
-                    icon.className = loading ? 'fas fa-spinner fa-spin' : 'fas fa-key';
-                }
-                
-                const text = this.elements.submitBtn.querySelector('span') || this.elements.submitBtn;
-                text.textContent = loading ? 'Alterando...' : 'Alterar Senha';
-            }
-        }
-
-        showValidationErrors() {
-            // Validar todos os campos e mostrar erros
-            this.elements.form?.querySelectorAll('input').forEach(input => {
-                this.validateField(input);
-            });
-            
-            // Scroll para o primeiro erro
-            const firstError = this.elements.form?.querySelector('.form-group.error input');
-            if (firstError) {
-                firstError.focus();
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            
-            // Vibração no mobile
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-        }
-
-        handleKeyboardEvents(e) {
-            // Enter nos campos de senha
-            if (e.key === 'Enter' && e.target.type === 'password') {
-                const inputs = Array.from(this.elements.form?.querySelectorAll('input[type="password"]') || []);
-                const currentIndex = inputs.indexOf(e.target);
-                
-                if (currentIndex < inputs.length - 1) {
-                    // Ir para próximo campo
-                    e.preventDefault();
-                    inputs[currentIndex + 1].focus();
-                } else {
-                    // Último campo, tentar submeter
-                    if (this.isFormValid()) {
-                        this.elements.submitBtn?.focus();
-                    }
-                }
-            }
-            
-            // Esc para cancelar
-            if (e.key === 'Escape') {
-                const cancelBtn = document.querySelector('.btn-secondary');
-                if (cancelBtn) {
-                    cancelBtn.click();
-                }
-            }
-        }
-
-        addRippleEffect(element) {
-            const ripple = document.createElement('div');
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(59, 130, 246, 0.3);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-                left: 50%;
-                top: 50%;
-                width: 20px;
-                height: 20px;
-                margin-left: -10px;
-                margin-top: -10px;
-                z-index: 10;
-            `;
-
-            element.style.position = 'relative';
-            element.appendChild(ripple);
-
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        }
-
-        // Utility function
-        debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-    }
-
-    // ===== FUNCIONALIDADES EXTRAS =====
-    class PasswordGenerator {
-        static generate(length = 12) {
-            const chars = {
-                lowercase: 'abcdefghijklmnopqrstuvwxyz',
-                uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-                numbers: '0123456789',
-                symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
-            };
-            
-            let password = '';
-            const charTypes = Object.values(chars);
-            
-            // Garantir pelo menos um de cada tipo
-            Object.values(chars).forEach(charSet => {
-                password += charSet[Math.floor(Math.random() * charSet.length)];
-            });
-            
-            // Preencher o resto aleatoriamente
-            for (let i = password.length; i < length; i++) {
-                const randomType = charTypes[Math.floor(Math.random() * charTypes.length)];
-                password += randomType[Math.floor(Math.random() * randomType.length)];
-            }
-            
-            // Embaralhar
-            return password.split('').sort(() => 0.5 - Math.random()).join('');
-        }
-    }
-
-    // ===== PERFORMANCE MONITOR =====
-    class PerformanceMonitor {
-        constructor() {
-            this.startTime = performance.now();
-        }
-
-        logInitTime() {
-            const endTime = performance.now();
-            const initTime = endTime - this.startTime;
-            console.log(`⚡ Password Change JS iniciado em ${initTime.toFixed(2)}ms`);
-        }
-    }
-
-    // ===== INICIALIZAÇÃO =====
-    const perfMonitor = new PerformanceMonitor();
+/**
+ * ===== INICIALIZAÇÃO =====
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔒 Change Password JS carregado');
     
-    // Inicializar quando DOM estiver pronto
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPasswordChange);
-    } else {
-        initPasswordChange();
+    // Inicializar funcionalidades
+    initPasswordValidation();
+    initFormEnhancements();
+    initSecurityFeatures();
+    setupKeyboardShortcuts();
+    
+    // Compatibilidade com dashboard.js
+    if (typeof window.dashboardUtils !== 'undefined') {
+        console.log('🔗 Integração com dashboard.js ativa');
     }
+});
 
-    function initPasswordChange() {
-        try {
-            // Inicializar gerenciador principal
-            new PasswordChangeManager();
-            
-            // Log de performance
-            perfMonitor.logInitTime();
-            
-            console.log('🚀 Password Change System iniciado com sucesso');
-        } catch (error) {
-            console.error('❌ Erro ao inicializar sistema de senha:', error);
+/**
+ * ===== VALIDAÇÃO DE SENHA EM TEMPO REAL =====
+ */
+function initPasswordValidation() {
+    const newPassword1 = document.querySelector('input[name="new_password1"]');
+    const newPassword2 = document.querySelector('input[name="new_password2"]');
+    const oldPassword = document.querySelector('input[name="old_password"]');
+    
+    if (!newPassword1 || !newPassword2) return;
+    
+    // Validação em tempo real para nova senha
+    newPassword1.addEventListener('input', function() {
+        validatePasswordStrength(this.value);
+        if (newPassword2.value) {
+            validatePasswordMatch(this.value, newPassword2.value);
         }
+    });
+    
+    // Validação de confirmação de senha
+    newPassword2.addEventListener('input', function() {
+        validatePasswordMatch(newPassword1.value, this.value);
+    });
+    
+    // Validação de senha atual
+    if (oldPassword) {
+        oldPassword.addEventListener('input', function() {
+            validateCurrentPassword(this);
+        });
     }
+    
+    console.log('✅ Validação de senha inicializada');
+}
 
-    // ===== GLOBAL SCOPE (para debugging) =====
-    window.GSLearningPassword = {
-        PasswordGenerator,
-        PerformanceMonitor,
-        version: '1.0.0'
+/**
+ * ===== VALIDAÇÃO DE FORÇA DA SENHA =====
+ */
+function validatePasswordStrength(password) {
+    const input = document.querySelector('input[name="new_password1"]');
+    if (!input) return;
+    
+    const strength = calculatePasswordStrength(password);
+    updatePasswordStrengthUI(input, strength);
+}
+
+function calculatePasswordStrength(password) {
+    if (!password) return { score: 0, label: 'Muito Fraca', color: 'red' };
+    
+    let score = 0;
+    const checks = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        numbers: /\d/.test(password),
+        symbols: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+        noPersonal: !/123|abc|senha|password/i.test(password)
     };
+    
+    // Calcular pontuação
+    score += checks.length ? 20 : 0;
+    score += checks.uppercase ? 15 : 0;
+    score += checks.lowercase ? 15 : 0;
+    score += checks.numbers ? 20 : 0;
+    score += checks.symbols ? 20 : 0;
+    score += checks.noPersonal ? 10 : 0;
+    
+    // Determinar força
+    if (score >= 80) return { score, label: 'Muito Forte', color: 'green', checks };
+    if (score >= 60) return { score, label: 'Forte', color: 'blue', checks };
+    if (score >= 40) return { score, label: 'Média', color: 'yellow', checks };
+    if (score >= 20) return { score, label: 'Fraca', color: 'orange', checks };
+    return { score, label: 'Muito Fraca', color: 'red', checks };
+}
 
-    // Adicionar CSS para ripple effect
-    if (!document.getElementById('ripple-styles')) {
-        const style = document.createElement('style');
-        style.id = 'ripple-styles';
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+function updatePasswordStrengthUI(input, strength) {
+    // Remover indicador anterior
+    const existingIndicator = input.parentElement.querySelector('.password-strength-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
     }
+    
+    // Criar indicador compacto apenas com badge
+    const indicator = document.createElement('div');
+    indicator.className = 'password-strength-indicator mt-2';
+    indicator.innerHTML = `
+        <div class="password-strength-compact">
+            <span class="text-sm text-gray-600">Força:</span>
+            <span class="strength-badge ${strength.color.replace('green', 'very-strong').replace('blue', 'strong').replace('yellow', 'medium').replace('orange', 'medium').replace('red', 'weak')}">${strength.label}</span>
+        </div>
+    `;
+    
+    input.parentElement.appendChild(indicator);
+    
+    // Atualizar borda do input
+    updateInputBorder(input, strength.color);
+}
 
-})();
+/**
+ * ===== VALIDAÇÃO DE CONFIRMAÇÃO DE SENHA =====
+ */
+function validatePasswordMatch(password1, password2) {
+    const input2 = document.querySelector('input[name="new_password2"]');
+    if (!input2) return;
+    
+    const isMatch = password1 === password2;
+    const isEmpty = !password2;
+    
+    if (isEmpty) {
+        updateInputBorder(input2, 'gray');
+        removeMatchIndicator(input2);
+    } else if (isMatch) {
+        updateInputBorder(input2, 'green');
+        updateMatchIndicator(input2, true);
+    } else {
+        updateInputBorder(input2, 'red');
+        updateMatchIndicator(input2, false);
+    }
+}
+
+function updateMatchIndicator(input, isMatch) {
+    removeMatchIndicator(input);
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'password-match-indicator mt-1 text-sm flex items-center';
+    
+    if (isMatch) {
+        indicator.innerHTML = `
+            <i class="fas fa-check-circle text-green-500 mr-1"></i>
+            <span class="text-green-600">As senhas coincidem</span>
+        `;
+    } else {
+        indicator.innerHTML = `
+            <i class="fas fa-times-circle text-red-500 mr-1"></i>
+            <span class="text-red-600">As senhas não coincidem</span>
+        `;
+    }
+    
+    input.parentElement.appendChild(indicator);
+}
+
+function removeMatchIndicator(input) {
+    const existing = input.parentElement.querySelector('.password-match-indicator');
+    if (existing) existing.remove();
+}
+
+/**
+ * ===== VALIDAÇÃO DE SENHA ATUAL =====
+ */
+function validateCurrentPassword(input) {
+    const hasValue = input.value.length > 0;
+    updateInputBorder(input, hasValue ? 'blue' : 'gray');
+}
+
+/**
+ * ===== UTILITÁRIOS DE UI =====
+ */
+function updateInputBorder(input, color) {
+    // Remover classes anteriores
+    input.classList.remove(
+        'border-gray-300', 'border-red-500', 'border-green-500', 
+        'border-blue-500', 'border-yellow-500', 'border-orange-500'
+    );
+    
+    // Adicionar nova classe
+    input.classList.add(`border-${color}-500`);
+    
+    // Adicionar efeito de foco
+    input.classList.remove('focus:ring-red-500', 'focus:ring-green-500', 'focus:ring-blue-500');
+    input.classList.add(`focus:ring-${color}-500`);
+}
+
+/**
+ * ===== MELHORIAS DO FORMULÁRIO =====
+ */
+function initFormEnhancements() {
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    if (!form || !submitBtn) return;
+    
+    // Loading state no submit
+    form.addEventListener('submit', function(e) {
+        if (!validateFormBeforeSubmit()) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Mostrar loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            Alterando senha...
+        `;
+    });
+    
+    // Auto-focus no primeiro campo
+    const firstInput = form.querySelector('input[type="password"]');
+    if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+    }
+    
+    console.log('✅ Melhorias do formulário inicializadas');
+}
+
+function validateFormBeforeSubmit() {
+    const oldPassword = document.querySelector('input[name="old_password"]').value;
+    const newPassword1 = document.querySelector('input[name="new_password1"]').value;
+    const newPassword2 = document.querySelector('input[name="new_password2"]').value;
+    
+    // Validações básicas
+    if (!oldPassword) {
+        showAlert('Por favor, digite sua senha atual', 'error');
+        return false;
+    }
+    
+    if (!newPassword1) {
+        showAlert('Por favor, digite uma nova senha', 'error');
+        return false;
+    }
+    
+    if (newPassword1 !== newPassword2) {
+        showAlert('As senhas não coincidem', 'error');
+        return false;
+    }
+    
+    if (newPassword1.length < 8) {
+        showAlert('A nova senha deve ter pelo menos 8 caracteres', 'error');
+        return false;
+    }
+    
+    if (oldPassword === newPassword1) {
+        showAlert('A nova senha deve ser diferente da senha atual', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * ===== RECURSOS DE SEGURANÇA =====
+ */
+function initSecurityFeatures() {
+    // Mostrar/ocultar senha
+    addPasswordToggleButtons();
+    
+    // Prevenir ataques de força bruta (rate limiting)
+    setupRateLimiting();
+    
+    // Detectar copy/paste
+    monitorPasswordActions();
+    
+    console.log('🔒 Recursos de segurança inicializados');
+}
+
+function addPasswordToggleButtons() {
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    
+    passwordInputs.forEach(input => {
+        // Adicionar classe para padding direito
+        input.classList.add('password-input');
+        
+        // Criar wrapper se não existir
+        if (!input.parentElement.classList.contains('password-toggle-wrapper')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'relative password-toggle-wrapper';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+            
+            // Criar botão toggle
+            const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'password-toggle-btn';
+            toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                this.innerHTML = isPassword ? 
+                    '<i class="fas fa-eye-slash"></i>' : 
+                    '<i class="fas fa-eye"></i>';
+            });
+            
+            wrapper.appendChild(toggleBtn);
+        }
+    });
+}
+
+function setupRateLimiting() {
+    let attemptCount = 0;
+    const maxAttempts = 5;
+    const lockoutTime = 5 * 60 * 1000; // 5 minutos
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        attemptCount++;
+        
+        if (attemptCount >= maxAttempts) {
+            e.preventDefault();
+            showAlert(`Muitas tentativas. Tente novamente em ${lockoutTime/60000} minutos.`, 'error');
+            
+            setTimeout(() => {
+                attemptCount = 0;
+            }, lockoutTime);
+        }
+    });
+}
+
+function monitorPasswordActions() {
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    
+    passwordInputs.forEach(input => {
+        input.addEventListener('paste', function() {
+            console.log('⚠️ Senha colada detectada');
+            showAlert('Evite colar senhas por segurança', 'warning');
+        });
+        
+        input.addEventListener('copy', function() {
+            console.log('⚠️ Tentativa de copiar senha detectada');
+            showAlert('Não recomendamos copiar senhas', 'warning');
+        });
+    });
+}
+
+/**
+ * ===== ATALHOS DE TECLADO =====
+ */
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + Enter para submeter
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+                submitBtn.click();
+            }
+        }
+        
+        // Escape para cancelar
+        if (e.key === 'Escape') {
+            const cancelBtn = document.querySelector('a[href*="dashboard"]');
+            if (cancelBtn) {
+                cancelBtn.click();
+            }
+        }
+    });
+    
+    console.log('⌨️ Atalhos de teclado configurados');
+}
+
+/**
+ * ===== UTILITÁRIOS =====
+ */
+function showAlert(message, type = 'info') {
+    // Criar alert temporário
+    const alert = document.createElement('div');
+    alert.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${getAlertClasses(type)}`;
+    alert.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas ${getAlertIcon(type)} mr-2"></i>
+            <span>${message}</span>
+            <button class="ml-4 text-lg">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.remove();
+        }
+    }, 5000);
+    
+    // Remover ao clicar no X
+    alert.querySelector('button').addEventListener('click', () => {
+        alert.remove();
+    });
+}
+
+function getAlertClasses(type) {
+    const classes = {
+        error: 'bg-red-100 border border-red-400 text-red-700',
+        warning: 'bg-yellow-100 border border-yellow-400 text-yellow-700',
+        success: 'bg-green-100 border border-green-400 text-green-700',
+        info: 'bg-blue-100 border border-blue-400 text-blue-700'
+    };
+    return classes[type] || classes.info;
+}
+
+function getAlertIcon(type) {
+    const icons = {
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        success: 'fa-check-circle',
+        info: 'fa-info-circle'
+    };
+    return icons[type] || icons.info;
+}
+
+/**
+ * ===== EXPORTAR FUNCIONALIDADES =====
+ */
+window.changePasswordUtils = {
+    validatePasswordStrength,
+    validatePasswordMatch,
+    updateInputBorder,
+    showAlert
+};

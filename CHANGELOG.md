@@ -75,3 +75,13 @@
 - Fix: Removido fundo escuro → branco, cards mais simples
 - Update: Só 1 card verde (sem animações problemáticas), layout em grid
 - Status: HTML mais equilibrado - agora vou arrumar o CSS
+
+## 2025-07-12 21:30
+Página atualizada: Alterar Senha
+Arquivo: templates/accounts/change_password.html
+Status: Concluído
+
+## 2025-07-12 21:35
+Página atualizada: Alterar Senha
+Arquivo: static/css/change_password.css
+Status: Iniciando atualização
